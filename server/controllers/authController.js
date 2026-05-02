@@ -107,14 +107,15 @@ if (role === 'admin') {
 
 // Send OTP email for non-admin users
 
-await sendOTPEmail({ email, name, otp });
-
+try {
+  await sendOTPEmail({ email, name, otp });
+  console.log('✅ OTP email sent to:', email);
+} catch (emailErr) {
+  console.error('❌ OTP email failed:', emailErr.message);
+}
 res.status(201).json({
-
   message: 'OTP sent to your email! Please verify to complete registration.',
-
   email
-
 });
   } catch (err) {
     console.error(err);
