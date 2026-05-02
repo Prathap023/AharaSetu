@@ -1,20 +1,29 @@
-require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-console.log('Email Host:', process.env.EMAIL_HOST);
-console.log('Email User:', process.env.EMAIL_USER);
+require('dotenv').config();
 
 const app = express();
 
-app.use(cors());
+// CORS fix
+app.use(cors({
+  origin: [
+    'http://localhost:3000',
+    'https://ahara-setu-zeta.vercel.app'
+  ],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 app.use(express.json());
 
+// Routes
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/food', require('./routes/foodRoutes'));
 app.use('/api/notifications', require('./routes/notificationRoutes'));
 
-
+// Connect to MongoDB and start server
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     console.log('✅ MongoDB Connected');
