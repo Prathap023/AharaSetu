@@ -28,7 +28,7 @@ function AdminPanel() {
 
   const fetchListings = async () => {
     try {
-      const res = await axios.get('https://aharasetu-backend-q6tj.onrender.com/api/food/admin/all', {
+      const res = await axios.get('http://localhost:5000/api/food/admin/all', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setListings(res.data);
@@ -38,7 +38,7 @@ function AdminPanel() {
 
   const handleApprove = async (id) => {
     try {
-      await axios.put(`https://aharasetu-backend-q6tj.onrender.com/api/food/admin/approve/${id}`, {},
+      await axios.put(`http://localhost:5000/api/food/admin/approve/${id}`, {},
         { headers: { Authorization: `Bearer ${token}` } });
       setMessage('✅ Listing approved!');
       fetchListings();
@@ -47,7 +47,7 @@ function AdminPanel() {
 
   const handleReject = async (id) => {
     try {
-      await axios.put(`https://aharasetu-backend-q6tj.onrender.com/api/food/admin/reject/${id}`, {},
+      await axios.put(`http://localhost:5000/api/food/admin/reject/${id}`, {},
         { headers: { Authorization: `Bearer ${token}` } });
       setMessage('❌ Listing rejected!');
       fetchListings();
@@ -56,7 +56,7 @@ function AdminPanel() {
 
   const handleComplete = async (id) => {
     try {
-      await axios.put(`https://aharasetu-backend-q6tj.onrender.com/api/food/admin/complete/${id}`, {},
+      await axios.put(`http://localhost:5000/api/food/admin/complete/${id}`, {},
         { headers: { Authorization: `Bearer ${token}` } });
       setMessage('🎉 Transaction marked as completed!');
       fetchListings();

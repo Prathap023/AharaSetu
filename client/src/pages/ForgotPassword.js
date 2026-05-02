@@ -16,7 +16,7 @@ function ForgotPassword() {
     setMessage('');
     try {
       const res = await axios.post(
-        'https://aharasetu-backend-q6tj.onrender.com/api/auth/forgot-password',
+        'http://localhost:5000/api/auth/forgot-password',
         { email }
       );
       setMessage(res.data.message);

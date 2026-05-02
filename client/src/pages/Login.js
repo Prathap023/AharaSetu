@@ -18,7 +18,7 @@ const handleSubmit = async (e) => {
   e.preventDefault();
   setLoading(true);
   try {
-    const res = await axios.post('https://aharasetu-backend-q6tj.onrender.com/api/auth/login', form);
+    const res = await axios.post('http://localhost:5000/api/auth/login', form);
     login(res.data.user, res.data.token);
     navigate('/');
   } catch (err) {

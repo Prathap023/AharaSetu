@@ -89,7 +89,7 @@ function CheckoutForm({ food, clientSecret }) {
       if (paymentIntent.status === 'succeeded') {
         // Step 3 — Tell backend
         await axios.put(
-          `https://aharasetu-backend-q6tj.onrender.com/api/food/pay/${food._id}`,
+          `http://localhost:5000/api/food/pay/${food._id}`,
           { paymentIntentId: paymentIntent.id },
           { headers: { Authorization: `Bearer ${token}` } }
         );
@@ -189,7 +189,7 @@ function Payment() {
     try {
       console.log('Fetching payment intent for:', id);
       const res = await axios.get(
-        `https://aharasetu-backend-q6tj.onrender.com/api/food/get-payment-intent/${id}`,
+        `http://localhost:5000/api/food/get-payment-intent/${id}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       console.log('Got client secret:', res.data.clientSecret?.substring(0, 20) + '...');

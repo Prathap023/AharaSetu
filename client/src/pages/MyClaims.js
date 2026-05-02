@@ -24,7 +24,7 @@ function MyClaims() {
 
   const fetchClaims = async () => {
     try {
-      const res = await axios.get('https://aharasetu-backend-q6tj.onrender.com/api/food/my-claims', {
+      const res = await axios.get('http://localhost:5000/api/food/my-claims', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setClaims(res.data);
@@ -34,7 +34,7 @@ function MyClaims() {
 
   const handlePickedUp = async (id) => {
     try {
-      await axios.put(`https://aharasetu-backend-q6tj.onrender.com/api/food/volunteer-pickedup/${id}`, {},
+      await axios.put(`http://localhost:5000/api/food/volunteer-pickedup/${id}`, {},
         { headers: { Authorization: `Bearer ${token}` } });
       setMessage('✅ Marked as picked up!');
       fetchClaims();

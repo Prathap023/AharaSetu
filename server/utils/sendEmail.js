@@ -1,11 +1,23 @@
-const { Resend } = require('resend');
-const resend = new Resend(process.env.RESEND_API_KEY);
+const nodemailer = require('nodemailer');
+
+const transporter = nodemailer.createTransport({
+  host: 'smtp.gmail.com',
+  port: 465,
+  secure: true,
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+  tls: {
+    rejectUnauthorized: false
+  }
+});
 
 const sendPaymentReceiptToVolunteer = async ({
   volunteerEmail, volunteerName, foodTitle, amount, paymentId, restaurantName, restaurantAddress, restaurantPhone,
 }) => {
-  await resend.emails.send({
-    from: 'AharaSetu <onboarding@resend.dev>',
+  await transporter.sendMail({
+    from: `"AharaSetu" <${process.env.EMAIL_FROM}>`,
     to: volunteerEmail,
     subject: `✅ Payment Receipt - ₹${amount} for ${foodTitle}`,
     html: `
@@ -44,8 +56,8 @@ const sendPaymentReceiptToVolunteer = async ({
 const sendPaymentNotificationToRestaurant = async ({
   restaurantEmail, restaurantName, foodTitle, amount, paymentId, volunteerName, volunteerEmail,
 }) => {
-  await resend.emails.send({
-    from: 'AharaSetu <onboarding@resend.dev>',
+  await transporter.sendMail({
+    from: `"AharaSetu" <${process.env.EMAIL_FROM}>`,
     to: restaurantEmail,
     subject: `💰 Payment Received - ₹${amount} for ${foodTitle}`,
     html: `
@@ -84,8 +96,8 @@ const sendPaymentNotificationToRestaurant = async ({
 const sendRefundNotification = async ({
   volunteerEmail, volunteerName, foodTitle, amount, paymentId,
 }) => {
-  await resend.emails.send({
-    from: 'AharaSetu <onboarding@resend.dev>',
+  await transporter.sendMail({
+    from: `"AharaSetu" <${process.env.EMAIL_FROM}>`,
     to: volunteerEmail,
     subject: `💸 Refund Processed - ₹${amount} for ${foodTitle}`,
     html: `
@@ -117,8 +129,8 @@ const sendRefundNotification = async ({
 };
 
 const sendPasswordResetEmail = async ({ email, name, resetUrl }) => {
-  await resend.emails.send({
-    from: 'AharaSetu <onboarding@resend.dev>',
+  await transporter.sendMail({
+    from: `"AharaSetu" <${process.env.EMAIL_FROM}>`,
     to: email,
     subject: `🔐 Password Reset Request - AharaSetu`,
     html: `
@@ -136,7 +148,7 @@ const sendPasswordResetEmail = async ({ email, name, resetUrl }) => {
             </a>
           </div>
           <div style="background-color: #fff3e0; padding: 15px; border-radius: 8px;">
-            <p style="margin: 0; color: #e65100; font-size: 13px;">⚠️ This link expires in <strong>15 minutes</strong>.</p>
+            <p style="margin: 0; color: #e65100; font-size: 13px;">⚠️ This link expires in <strong>15 minutes</strong>. If you did not request this, ignore this email.</p>
           </div>
           <p style="color: #666; font-size: 13px; margin-top: 15px;">Or copy this link:</p>
           <p style="color: #1565c0; font-size: 13px; word-break: break-all;">${resetUrl}</p>
@@ -148,10 +160,9 @@ const sendPasswordResetEmail = async ({ email, name, resetUrl }) => {
     `
   });
 };
-
 const sendOTPEmail = async ({ email, name, otp }) => {
-  await resend.emails.send({
-    from: 'AharaSetu <onboarding@resend.dev>',
+  await transporter.sendMail({
+    from: `"AharaSetu" <${process.env.EMAIL_FROM}>`,
     to: email,
     subject: `🔐 Your OTP for AharaSetu Registration`,
     html: `
@@ -161,19 +172,19 @@ const sendOTPEmail = async ({ email, name, otp }) => {
           <p style="color: #c8e6c9; margin: 5px 0 0;">Email Verification</p>
         </div>
         <div style="padding: 30px;">
-          <p>Dear <strong>${name}</strong>,</p>
-          <p>Your OTP for registration is:</p>
+          <p style="font-size: 16px;">Dear <strong>${name}</strong>,</p>
+          <p>Thank you for registering with AharaSetu! Use the OTP below to verify your email:</p>
           <div style="text-align: center; margin: 30px 0;">
             <div style="background-color: #2e7d32; color: white; font-size: 36px; font-weight: bold; padding: 20px 40px; border-radius: 12px; letter-spacing: 8px; display: inline-block;">
               ${otp}
             </div>
           </div>
           <div style="background-color: #fff3e0; padding: 15px; border-radius: 8px;">
-            <p style="margin: 0; color: #e65100; font-size: 13px;">⚠️ This OTP expires in <strong>10 minutes</strong>.</p>
+            <p style="margin: 0; color: #e65100; font-size: 13px;">⚠️ This OTP expires in <strong>10 minutes</strong>. Do not share it with anyone.</p>
           </div>
         </div>
-        <div style="background-color: #f5f5f5; padding: 15px; text-align: center;">
-          <p style="color: #888; font-size: 12px; margin: 0;">© 2025 AharaSetu</p>
+        <div style="background-color: #f5f5f5; padding: 15px; text-align: center; border-radius: 0 0 8px 8px;">
+          <p style="color: #888; font-size: 12px; margin: 0;">© 2025 AharaSetu — Connecting surplus food with people in need</p>
         </div>
       </div>
     `

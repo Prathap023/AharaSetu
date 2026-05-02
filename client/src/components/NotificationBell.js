@@ -36,7 +36,7 @@ function NotificationBell() {
 
   const fetchUnreadCount = async () => {
     try {
-      const res = await axios.get('https://aharasetu-backend-q6tj.onrender.com/api/notifications/unread-count', {
+      const res = await axios.get('http://localhost:5000/api/notifications/unread-count', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setUnreadCount(res.data.count);
@@ -47,7 +47,7 @@ function NotificationBell() {
 
   const fetchNotifications = async () => {
     try {
-      const res = await axios.get('https://aharasetu-backend-q6tj.onrender.com/api/notifications', {
+      const res = await axios.get('http://localhost:5000/api/notifications', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setNotifications(res.data);
@@ -65,7 +65,7 @@ function NotificationBell() {
 
   const handleMarkAllRead = async () => {
     try {
-      await axios.put('https://aharasetu-backend-q6tj.onrender.com/api/notifications/mark-all-read', {}, {
+      await axios.put('http://localhost:5000/api/notifications/mark-all-read', {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setUnreadCount(0);
@@ -77,7 +77,7 @@ function NotificationBell() {
 
   const handleMarkOneRead = async (id) => {
     try {
-      await axios.put(`https://aharasetu-backend-q6tj.onrender.com/api/notifications/mark-read/${id}`, {}, {
+      await axios.put(`http://localhost:5000/api/notifications/mark-read/${id}`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       fetchUnreadCount();
@@ -89,7 +89,7 @@ function NotificationBell() {
 
   const handleDeleteAll = async () => {
     try {
-      await axios.delete('https://aharasetu-backend-q6tj.onrender.com/api/notifications/delete-all', {
+      await axios.delete('http://localhost:5000/api/notifications/delete-all', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setNotifications([]);

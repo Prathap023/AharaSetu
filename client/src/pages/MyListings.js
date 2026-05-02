@@ -27,7 +27,7 @@ useEffect(() => {
 
   const fetchListings = async () => {
     try {
-      const res = await axios.get('https://aharasetu-backend-q6tj.onrender.com/api/food/my-listings', {
+      const res = await axios.get('http://localhost:5000/api/food/my-listings', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setListings(res.data);
@@ -37,7 +37,7 @@ useEffect(() => {
 
   const handleApprove = async (id) => {
     try {
-      await axios.put(`https://aharasetu-backend-q6tj.onrender.com/api/food/approve-claim/${id}`, {},
+      await axios.put(`http://localhost:5000/api/food/approve-claim/${id}`, {},
         { headers: { Authorization: `Bearer ${token}` } });
       setMessage('✅ Claim approved!');
       fetchListings();
@@ -46,7 +46,7 @@ useEffect(() => {
 
   const handleReject = async (id) => {
     try {
-      await axios.put(`https://aharasetu-backend-q6tj.onrender.com/api/food/reject-claim/${id}`, {},
+      await axios.put(`http://localhost:5000/api/food/reject-claim/${id}`, {},
         { headers: { Authorization: `Bearer ${token}` } });
       setMessage('✅ Claim rejected and payment refunded!');
       fetchListings();
@@ -55,7 +55,7 @@ useEffect(() => {
 
   const handleProvided = async (id) => {
     try {
-      await axios.put(`https://aharasetu-backend-q6tj.onrender.com/api/food/restaurant-provided/${id}`, {},
+      await axios.put(`http://localhost:5000/api/food/restaurant-provided/${id}`, {},
         { headers: { Authorization: `Bearer ${token}` } });
       setMessage('✅ Marked as provided!');
       fetchListings();

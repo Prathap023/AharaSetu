@@ -12,7 +12,7 @@ function Home() {
 
   const fetchListings = async () => {
     try {
-      const res = await axios.get('https://aharasetu-backend-q6tj.onrender.com/api/food');
+      const res = await axios.get('http://localhost:5000/api/food');
       setListings(res.data);
     } catch (err) {
       console.error(err);
@@ -39,7 +39,7 @@ useEffect(() => {
     }
     try {
       const res = await axios.put(
-        `https://aharasetu-backend-q6tj.onrender.com/api/food/claim/${item._id}`, {},
+        `http://localhost:5000/api/food/claim/${item._id}`, {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
       if (item.type === 'paid') {
