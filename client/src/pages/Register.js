@@ -17,7 +17,7 @@ function Register() {
     setLoading(true);
     setError('');
     try {
-      await axios.post('http://localhost:5000/api/auth/register', form);
+      await axios.post('https://aharasetu-backend.onrender.com/api/auth/register', form);
       navigate('/verify-otp', { state: { email: form.email } });
     } catch (err) {
       setError(err.response?.data?.message || 'Something went wrong');
