@@ -72,7 +72,7 @@ function VerifyOTP() {
     setLoading(true);
     setError('');
     try {
-      await axios.post('https://aharasetu-backend.onrender.com/api/auth/verify-otp', {
+      await axios.post('https://aharasetu-backend-q6tj.onrender.com/api/auth/verify-otp', {
         email,
         otp: otpString
       });
@@ -88,7 +88,7 @@ function VerifyOTP() {
     setResendLoading(true);
     setError('');
     try {
-      await axios.post('https://aharasetu-backend.onrender.com/api/auth/resend-otp', { email });
+      await axios.post('https://aharasetu-backend-q6tj.onrender.com/api/auth/resend-otp', { email });
       setMessage('✅ New OTP sent to your email!');
       setTimer(600);
       setOtp(['', '', '', '', '', '']);

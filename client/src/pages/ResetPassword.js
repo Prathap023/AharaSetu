@@ -30,7 +30,7 @@ function ResetPassword() {
     setLoading(true);
     try {
       const res = await axios.post(
-        `https://aharasetu-backend.onrender.com/api/auth/reset-password/${token}`,
+        `https://aharasetu-backend-q6tj.onrender.com/api/auth/reset-password/${token}`,
         { password }
       );
       setMessage(res.data.message);

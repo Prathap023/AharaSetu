@@ -33,7 +33,7 @@ function Dashboard() {
     e.preventDefault();
     setLoading(true);
     try {
-      await axios.post('https://aharasetu-backend.onrender.com/api/food', form, {
+      await axios.post('https://aharasetu-backend-q6tj.onrender.com/api/food', form, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setMessage('✅ Food listing submitted! Waiting for admin approval.');
