@@ -5,17 +5,8 @@ require('dotenv').config();
 
 const app = express();
 
-// CORS fix
-app.use(cors({
-  origin: [
-    'http://localhost:3000',
-    'https://ahara-setu-zeta.vercel.app'
-  ],
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
-
+// Allow ALL origins for now
+app.use(cors());
 app.use(express.json());
 
 // Routes
