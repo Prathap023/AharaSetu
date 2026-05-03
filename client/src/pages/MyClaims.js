@@ -80,7 +80,9 @@ function MyClaims() {
         </div>
       ) : (
         <div style={styles.grid}>
-          {claims.map(item => {
+          {[...claims]
+          .sort((a, b) => new Date(b.createdAt || b._id) - new Date(a.createdAt || a._id))
+          .map(item => {
             const statusInfo = getStatusInfo(item);
             const ackStatus = getAcknowledgementStatus(item);
             return (

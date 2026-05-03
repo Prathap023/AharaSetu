@@ -85,7 +85,8 @@ function AdminPanel() {
     return { text: '⏳ Pending Admin Review', color: '#f57f17' };
   };
 
-  const filteredListings = listings.filter(item => {
+const filteredListings = listings
+  .filter(item => {
     if (filter === 'all') return true;
     if (filter === 'pending') return !item.adminApproved && !item.adminRejected;
     if (filter === 'approved') return item.adminApproved && item.status !== 'completed';
@@ -93,6 +94,10 @@ function AdminPanel() {
     if (filter === 'completed') return item.status === 'completed';
     if (filter === 'action') return item.restaurantProvided && item.volunteerPickedUp && !item.adminCompleted;
     return true;
+  })
+  .sort((a, b) => {
+    // fallback-safe sorting (handles missing createdAt)
+    return new Date(b.createdAt || b._id) - new Date(a.createdAt || a._id);
   });
 
   if (loading) return <div style={styles.center}><p>Loading...</p></div>;

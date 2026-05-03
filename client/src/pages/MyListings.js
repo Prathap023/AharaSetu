@@ -103,7 +103,9 @@ useEffect(() => {
         </div>
       ) : (
         <div style={styles.grid}>
-          {listings.map(item => {
+          {[...listings]
+            .sort((a, b) => new Date(b.createdAt || b._id) - new Date(a.createdAt || a._id))
+            .map(item => {
             const badge = getStatusBadge(item);
             const ackStatus = getAcknowledgementStatus(item);
             return (
