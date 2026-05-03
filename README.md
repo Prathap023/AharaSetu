@@ -185,8 +185,8 @@ This project is open-source and available under the MIT License.
 
 ## 👨‍💻 Author
 
-**Prathap Reddy**
-BCA Student | Full Stack Developer
+**Bhanupratap Reddy**
+MCA Student | Full Stack Developer
 
 ---
 
