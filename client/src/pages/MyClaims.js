@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import RatingModal from '../components/RatingModal';
+import StarRating from '../components/StarRating';
 
 function MyClaims() {
   const { user, token } = useAuth();
@@ -9,6 +11,8 @@ function MyClaims() {
   const [claims, setClaims] = useState([]);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState('');
+  const [ratingModal, setRatingModal] = useState(null);
+  const [myRatings, setMyRatings] = useState({});
 
  useEffect(() => {
   if (!user) { navigate('/login'); return; }
@@ -28,8 +32,24 @@ function MyClaims() {
         headers: { Authorization: `Bearer ${token}` }
       });
       setClaims(res.data);
+      fetchMyRatings(res.data);
     } catch (err) { console.error(err); }
     setLoading(false);
+  };
+  const fetchMyRatings = async (claims) => {
+    const ratings = {};
+    for (const claim of claims) {
+      if (claim.status === 'completed') {
+        try {
+          const res = await axios.get(
+            `http://localhost:5000/api/ratings/my-rating/${claim._id}`,
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+          if (res.data) ratings[claim._id] = res.data;
+        } catch (err) {}
+      }
+    }
+    setMyRatings(ratings);
   };
 
   const handlePickedUp = async (id) => {
@@ -128,6 +148,32 @@ function MyClaims() {
                     💳 Pay Now - ₹{item.price}
                   </button>
                 )}
+                {item.status === 'completed' && (
+                  <div style={styles.ratingSection}>
+                    <p style={styles.ratingTitle}>⭐ Your Rating</p>
+                    {myRatings[item._id] ? (
+                      <div style={styles.ratingDisplay}>
+                        <StarRating value={myRatings[item._id].stars} readOnly size="20px" />
+                        {myRatings[item._id].comment && (
+                          <p style={styles.ratingComment}>"{myRatings[item._id].comment}"</p>
+                        )}
+                        <button
+                          style={styles.editRatingBtn}
+                          onClick={() => setRatingModal(item)}
+                        >
+                          ✏️ Edit Rating
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        style={styles.rateBtn}
+                        onClick={() => setRatingModal(item)}
+                      >
+                        ⭐ Rate this Restaurant
+                      </button>
+                    )}
+                  </div>
+                )}
 
                 {ackStatus && (
                   <div style={{
@@ -156,6 +202,16 @@ function MyClaims() {
           })}
         </div>
       )}
+      {ratingModal && (
+        <RatingModal
+          listing={ratingModal}
+          onClose={() => setRatingModal(null)}
+          onSaved={() => {
+            fetchClaims();
+            setRatingModal(null);
+          }}
+        />
+      )}
     </div>
   );
 }
@@ -182,6 +238,13 @@ const styles = {
   center: { textAlign: 'center', padding: '60px' },
   reportBtn: { width: '100%', padding: '10px', backgroundColor: '#fff3e0', color: '#e65100', border: '2px solid #e65100', borderRadius: '8px', cursor: 'pointer', fontSize: '14px', marginTop: '10px', fontWeight: 'bold' },
   btn: { padding: '10px 20px', backgroundColor: '#2e7d32', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', marginTop: '15px' },
+  ratingSection: { marginTop: '12px', padding: '12px', backgroundColor: '#fffbeb', borderRadius: '8px', border: '1px solid #fde68a' },
+ratingTitle: { fontSize: '13px', fontWeight: '600', color: '#92400e', marginBottom: '8px' },
+ratingDisplay: { display: 'flex', flexDirection: 'column', gap: '6px' },
+ratingComment: { fontSize: '13px', color: '#6b7280', fontStyle: 'italic', margin: 0 },
+rateBtn: { width: '100%', padding: '10px', backgroundColor: '#f59e0b', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '14px', fontWeight: '600' },
+editRatingBtn: { padding: '6px 14px', backgroundColor: 'white', border: '1px solid #fde68a', borderRadius: '6px', cursor: 'pointer', fontSize: '12px', color: '#92400e', fontWeight: '500' },
+
 };
 
 export default MyClaims;

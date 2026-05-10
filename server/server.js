@@ -13,6 +13,7 @@ app.use(express.json());
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/food', require('./routes/foodRoutes'));
 app.use('/api/notifications', require('./routes/notificationRoutes'));
+app.use('/api/ratings', require('./routes/ratingRoutes'));
 
 // Connect to MongoDB and start server
 mongoose.connect(process.env.MONGO_URI)
