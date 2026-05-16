@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import StarRating from '../components/StarRating';
 
 function Home() {
   const { token } = useAuth();
@@ -9,19 +10,34 @@ function Home() {
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState('');
+  const [ratings, setRatings] = useState({});
 
   const fetchListings = async () => {
+  try {
+    const res = await axios.get('http://localhost:5000/api/food');
+    setListings(res.data);
+    fetchRatings(res.data);
+  } catch (err) {
+    console.error(err);
+  }
+  setLoading(false);
+};
+  const fetchRatings = async (listings) => {
+  const ratings = {};
+  for (const item of listings) {
     try {
-      const res = await axios.get('http://localhost:5000/api/food');
-      setListings(res.data);
-    } catch (err) {
-      console.error(err);
-    }
-    setLoading(false);
-  };
+      const res = await axios.get(
+        `http://localhost:5000/api/ratings/average/${item.postedBy._id}`
+      );
+      ratings[item.postedBy._id] = res.data;
+    } catch (err) {}
+  }
+  setRatings(ratings);
+};
 
 useEffect(() => {
   fetchListings();
+  
 
   // Auto refresh every 5 seconds
   const interval = setInterval(() => {
@@ -30,6 +46,7 @@ useEffect(() => {
 
   return () => clearInterval(interval);
 }, []);
+
 
   const handleClaim = async (item) => {
     if (!token) {
@@ -52,6 +69,7 @@ useEffect(() => {
       setMessage(err.response?.data?.message || '❌ Something went wrong!');
     }
   };
+  
 
   if (loading) return (
     <div style={styles.center}><p>Loading food listings... 🍱</p></div>
@@ -99,6 +117,26 @@ useEffect(() => {
                 <p>📞 {item.phone}</p>
                 <p>📧 {item.contactEmail}</p>
               </div>
+              <div style={styles.ratingBox}>
+  <p style={styles.ratingLabel}>🏪 Restaurant Rating</p>
+  {ratings[item.postedBy?._id]?.average ? (
+    <div style={styles.ratingRow}>
+      <StarRating
+        value={parseFloat(ratings[item.postedBy._id].average)}
+        readOnly
+        size="18px"
+      />
+      <span style={styles.ratingNum}>
+        {ratings[item.postedBy._id].average}
+      </span>
+      <span style={styles.ratingCount}>
+        ({ratings[item.postedBy._id].total} {ratings[item.postedBy._id].total === 1 ? 'review' : 'reviews'})
+      </span>
+    </div>
+  ) : (
+    <p style={styles.noRating}>No ratings yet</p>
+  )}
+</div>
 
               <button
                 style={styles.btn}
@@ -246,6 +284,12 @@ const styles = {
     margin: '0 auto 20px',
     fontWeight: '500',
   },
+  ratingBox: { backgroundColor: '#fffbeb', border: '1px solid #fde68a', borderRadius: '8px', padding: '10px 12px', marginBottom: '14px' },
+ratingLabel: { fontSize: '12px', fontWeight: '600', color: '#92400e', marginBottom: '6px' },
+ratingRow: { display: 'flex', alignItems: 'center', gap: '8px' },
+ratingNum: { fontSize: '14px', fontWeight: '700', color: '#f59e0b' },
+ratingCount: { fontSize: '12px', color: '#9ca3af' },
+noRating: { fontSize: '12px', color: '#9ca3af', margin: 0 },
 };
 
 export default Home;

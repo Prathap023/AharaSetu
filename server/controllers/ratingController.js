@@ -49,7 +49,10 @@ exports.getMyRating = async (req, res) => {
 // Get all ratings for a restaurant (for My Listings page)
 exports.getRestaurantRatings = async (req, res) => {
   try {
-    const ratings = await Rating.find({ restaurant: req.params.restaurantId })
+
+    const ratings = await Rating.find({
+      foodListing: req.params.restaurantId
+    })
       .populate('volunteer', 'name')
       .populate('foodListing', 'title')
       .sort({ createdAt: -1 });
@@ -58,12 +61,16 @@ exports.getRestaurantRatings = async (req, res) => {
       ? (ratings.reduce((sum, r) => sum + r.stars, 0) / ratings.length).toFixed(1)
       : null;
 
-    res.json({ ratings, average: avg, total: ratings.length });
+    res.json({
+      ratings,
+      average: avg,
+      total: ratings.length
+    });
+
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
-
 // Get average rating for a restaurant (for Home page)
 exports.getRestaurantAverage = async (req, res) => {
   try {
