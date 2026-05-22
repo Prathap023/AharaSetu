@@ -66,7 +66,7 @@ function ContactUs() {
             <span style={styles.infoIcon}>📧</span>
             <div>
               <p style={styles.infoLabel}>Email Us</p>
-              <p style={styles.infoValue}>admin@aharasetu.com</p>
+              <p style={styles.infoValue}>admin@aharasetu.com <del>this mail not working as of now</del></p>
             </div>
           </div>
           <div style={styles.infoItem}>
