@@ -11,20 +11,12 @@ function AdminPanel() {
   const [message, setMessage] = useState('');
   const [filter, setFilter] = useState('all');
 
- useEffect(() => {
-  if (!user || user.role !== 'admin') {
-    navigate('/login');
-    return;
-  }
-  fetchListings();
-
-  // Auto refresh every 5 seconds
-  const interval = setInterval(() => {
+  useEffect(() => {
+    if (!user || user.role !== 'admin') { navigate('/login'); return; }
     fetchListings();
-  }, 2000);
-
-  return () => clearInterval(interval);
-}, []);
+    const interval = setInterval(fetchListings, 5000);
+    return () => clearInterval(interval);
+  }, []);
 
   const fetchListings = async () => {
     try {
@@ -58,217 +50,328 @@ function AdminPanel() {
     try {
       await axios.put(`http://localhost:5000/api/food/admin/complete/${id}`, {},
         { headers: { Authorization: `Bearer ${token}` } });
-      setMessage('🎉 Transaction marked as completed!');
+      setMessage('🎉 Transaction completed!');
       fetchListings();
     } catch (err) { setMessage('❌ ' + (err.response?.data?.message || 'Something went wrong!')); }
   };
 
-  const getAcknowledgementStatus = (item) => {
+  const getAckStatus = (item) => {
     if (item.status !== 'claimed' && item.status !== 'completed') return null;
-    if (item.adminCompleted) return { text: '🎉 Transaction Completed', color: '#2e7d32' };
+    if (item.adminCompleted) return { text: '🎉 Transaction Completed', color: '#16A34A', bg: '#F0FDF4' };
     if (item.restaurantProvided && item.volunteerPickedUp)
-      return { text: '🔔 Both acknowledged — Ready to Complete!', color: '#6a1b9a' };
+      return { text: '🔔 Both acknowledged — Ready to Complete!', color: '#7C3AED', bg: '#FAF5FF' };
     if (item.restaurantProvided && !item.volunteerPickedUp)
-      return { text: '⏳ Restaurant provided — Waiting for volunteer pickup', color: '#f57f17' };
+      return { text: '⏳ Restaurant provided — waiting for volunteer', color: '#D97706', bg: '#FFFBEB' };
     if (!item.restaurantProvided && item.volunteerPickedUp)
-      return { text: '⏳ Volunteer picked up — Waiting for restaurant acknowledgement', color: '#e65100' };
-    return { text: '⏳ Waiting for both to acknowledge', color: '#666' };
+      return { text: '⏳ Volunteer picked up — waiting for restaurant', color: '#D97706', bg: '#FFFBEB' };
+    return { text: '⏳ Waiting for both to acknowledge', color: '#6B7280', bg: '#F9FAFB' };
   };
 
   const getStatusBadge = (item) => {
-    if (item.status === 'completed') return { text: '🎉 Completed', color: '#2e7d32' };
-    if (item.adminRejected) return { text: '❌ Rejected', color: '#c62828' };
-    if (item.adminApproved && item.status === 'available') return { text: '✅ Live', color: '#2e7d32' };
-    if (item.adminApproved && item.status === 'claimed') return { text: '📦 Claimed', color: '#1565c0' };
-    if (item.adminApproved && item.status === 'pending_payment') return { text: '💳 Pending Payment', color: '#1565c0' };
-    if (item.adminApproved && item.status === 'pending_restaurant_approval') return { text: '⏳ Pending Restaurant Approval', color: '#f57f17' };
-    return { text: '⏳ Pending Admin Review', color: '#f57f17' };
+    if (item.status === 'completed') return { label: '🎉 Completed', color: '#16A34A', bg: '#F0FDF4' };
+    if (item.adminRejected) return { label: '❌ Rejected', color: '#DC2626', bg: '#FEF2F2' };
+    if (item.adminApproved && item.status === 'available') return { label: '✅ Live', color: '#16A34A', bg: '#F0FDF4' };
+    if (item.adminApproved && item.status === 'claimed') return { label: '📦 Claimed', color: '#2563EB', bg: '#EFF6FF' };
+    if (item.adminApproved && item.status === 'pending_payment') return { label: '💳 Pending Payment', color: '#7C3AED', bg: '#FAF5FF' };
+    if (item.adminApproved && item.status === 'pending_restaurant_approval') return { label: '⏳ Awaiting Restaurant', color: '#D97706', bg: '#FFFBEB' };
+    return { label: '⏳ Pending Review', color: '#D97706', bg: '#FFFBEB' };
   };
 
-const filteredListings = listings
-  .filter(item => {
+  const tabs = [
+    { key: 'all', label: 'All' },
+    { key: 'pending', label: 'Pending' },
+    { key: 'approved', label: 'Approved' },
+    { key: 'action', label: '🔔 Action Needed' },
+    { key: 'completed', label: 'Completed' },
+    { key: 'rejected', label: 'Rejected' },
+  ];
+
+  const tabCounts = {
+    all: listings.length,
+    pending: listings.filter(i => !i.adminApproved && !i.adminRejected).length,
+    approved: listings.filter(i => i.adminApproved && !i.adminRejected && i.status !== 'completed').length,
+    action: listings.filter(i => i.restaurantProvided && i.volunteerPickedUp && !i.adminCompleted).length,
+    completed: listings.filter(i => i.status === 'completed').length,
+    rejected: listings.filter(i => i.adminRejected).length,
+  };
+
+  const filtered = listings.filter(item => {
     if (filter === 'all') return true;
     if (filter === 'pending') return !item.adminApproved && !item.adminRejected;
-    if (filter === 'approved') return item.adminApproved && item.status !== 'completed';
-    if (filter === 'rejected') return item.adminRejected === true;
-    if (filter === 'completed') return item.status === 'completed';
+    if (filter === 'approved') return item.adminApproved && !item.adminRejected && item.status !== 'completed';
     if (filter === 'action') return item.restaurantProvided && item.volunteerPickedUp && !item.adminCompleted;
+    if (filter === 'completed') return item.status === 'completed';
+    if (filter === 'rejected') return item.adminRejected;
     return true;
-  })
-  .sort((a, b) => {
-    // fallback-safe sorting (handles missing createdAt)
-    return new Date(b.createdAt || b._id) - new Date(a.createdAt || a._id);
   });
 
-  if (loading) return <div style={styles.center}><p>Loading...</p></div>;
+  if (loading) return (
+    <div style={styles.loadingPage}>
+      <div style={styles.spinner} />
+      <p style={styles.loadingText}>Loading admin panel...</p>
+    </div>
+  );
 
   return (
-    <div style={styles.container}>
-      <div style={styles.header}>
-        <h2 style={styles.title}>🛡️ Admin Panel</h2>
-        <p style={styles.subtitle}>Manage all food listings and transactions</p>
-      </div>
+    <div style={styles.page}>
+      <div style={styles.wrap}>
 
-      {/* Stats */}
-      <div style={styles.statsRow}>
-        <div style={styles.statBox}>
-          <p style={styles.statNum}>{listings.length}</p>
-          <p style={styles.statLabel}>Total Listings</p>
+        {/* Header */}
+        <div style={styles.header}>
+          <div>
+            <h1 style={styles.title}>Admin Panel</h1>
+            <p style={styles.sub}>Review listings, manage claims and complete transactions</p>
+          </div>
+          <div style={styles.adminBadge}>🛡️ Admin</div>
         </div>
-        <div style={styles.statBox}>
-          <p style={styles.statNum}>{listings.filter(i => !i.adminApproved && !i.adminRejected).length}</p>
-          <p style={styles.statLabel}>Pending Review</p>
+
+        {/* Stats */}
+        <div style={styles.statsGrid}>
+          <div style={styles.statCard}>
+            <div style={styles.statIcon}>📋</div>
+            <span style={styles.statNum}>{listings.length}</span>
+            <span style={styles.statLbl}>Total Listings</span>
+          </div>
+          <div style={styles.statCard}>
+            <div style={styles.statIcon}>⏳</div>
+            <span style={styles.statNum}>{tabCounts.pending}</span>
+            <span style={styles.statLbl}>Pending Review</span>
+          </div>
+          <div style={{
+            ...styles.statCard,
+            border: tabCounts.action > 0 ? '1px solid #EDE9FE' : '1px solid #F0F0F0',
+            background: tabCounts.action > 0 ? '#FAF5FF' : 'white',
+          }}>
+            <div style={styles.statIcon}>🔔</div>
+            <span style={{ ...styles.statNum, color: tabCounts.action > 0 ? '#7C3AED' : '#FF5200' }}>
+              {tabCounts.action}
+            </span>
+            <span style={styles.statLbl}>Action Needed</span>
+          </div>
+          <div style={styles.statCard}>
+            <div style={styles.statIcon}>🎉</div>
+            <span style={styles.statNum}>{tabCounts.completed}</span>
+            <span style={styles.statLbl}>Completed</span>
+          </div>
+          <div style={styles.statCard}>
+            <div style={styles.statIcon}>❌</div>
+            <span style={{ ...styles.statNum, color: tabCounts.rejected > 0 ? '#DC2626' : '#FF5200' }}>
+              {tabCounts.rejected}
+            </span>
+            <span style={styles.statLbl}>Rejected</span>
+          </div>
         </div>
-        <div style={styles.statBox}>
-          <p style={styles.statNum}>{listings.filter(i => i.restaurantProvided && i.volunteerPickedUp && !i.adminCompleted).length}</p>
-          <p style={styles.statLabel}>Ready to Complete</p>
+
+        {/* Tabs */}
+        <div style={styles.tabsWrap}>
+          {tabs.map(tab => (
+            <button
+              key={tab.key}
+              style={{
+                ...styles.tab,
+                ...(filter === tab.key ? styles.tabActive : {})
+              }}
+              onClick={() => setFilter(tab.key)}
+            >
+              {tab.label}
+              <span style={{
+                ...styles.tabCount,
+                background: filter === tab.key ? 'rgba(255,255,255,0.25)' : '#F3F4F6',
+                color: filter === tab.key ? 'white' : '#6B7280',
+              }}>
+                {tabCounts[tab.key]}
+              </span>
+            </button>
+          ))}
         </div>
-        <div style={styles.statBox}>
-          <p style={styles.statNum}>{listings.filter(i => i.status === 'completed').length}</p>
-          <p style={styles.statLabel}>Completed</p>
-        </div>
-        <div style={{ ...styles.statBox, borderTop: '3px solid #c62828' }}>
-          <p style={{ ...styles.statNum, color: '#c62828' }}>{listings.filter(i => i.adminRejected).length}</p>
-          <p style={styles.statLabel}>Rejected</p>
-        </div>
-      </div>
 
-      <div style={styles.filterRow}>
-      {[
-        { key: 'all', label: '📋 All', color: '#2e7d32' },
-        { key: 'pending', label: '⏳ Pending', color: '#f57f17' },
-        { key: 'approved', label: '✅ Approved', color: '#2e7d32' },
-        { key: 'rejected', label: '❌ Rejected', color: '#c62828' },
-        { key: 'action', label: '🔔 Action Needed', color: '#6a1b9a' },
-        { key: 'completed', label: '🎉 Completed', color: '#1565c0' },
-      ].map(f => (
-        <button key={f.key} style={{
-          ...styles.filterBtn,
-          backgroundColor: filter === f.key ? f.color : 'white',
-          color: filter === f.key ? 'white' : f.color,
-          borderColor: f.color,
-        }} onClick={() => setFilter(f.key)}>
-          {f.label}
-        </button>
-      ))}
-    </div>
+        {/* Message */}
+        {message && (
+          <div style={{
+            ...styles.msgBox,
+            background: message.includes('✅') || message.includes('🎉') ? '#F0FDF4' : '#FEF2F2',
+            borderColor: message.includes('✅') || message.includes('🎉') ? '#BBF7D0' : '#FECACA',
+            color: message.includes('✅') || message.includes('🎉') ? '#16A34A' : '#DC2626',
+          }}>
+            {message}
+          </div>
+        )}
 
-      {message && <p style={styles.message}>{message}</p>}
+        {/* Grid */}
+        {filtered.length === 0 ? (
+          <div style={styles.empty}>
+            <div style={styles.emptyIcon}>📭</div>
+            <h3 style={styles.emptyTitle}>Nothing here</h3>
+            <p style={styles.emptySub}>No listings match this filter</p>
+          </div>
+        ) : (
+          <div style={styles.grid}>
+            {filtered.map(item => {
+              const badge = getStatusBadge(item);
+              const ack = getAckStatus(item);
+              return (
+                <div key={item._id} style={styles.card}>
 
-      {filteredListings.length === 0 ? (
-        <div style={styles.empty}><p>No listings found for this filter.</p></div>
-      ) : (
-        <div style={styles.grid}>
-          {filteredListings.map(item => {
-            const badge = getStatusBadge(item);
-            const ackStatus = getAcknowledgementStatus(item);
-            return (
-              <div key={item._id} style={styles.card}>
-                <div style={styles.cardTop}>
-                  <h3 style={styles.foodTitle}>{item.title}</h3>
-                  <span style={{ ...styles.badge, backgroundColor: badge.color }}>
-                    {badge.text}
-                  </span>
-                </div>
+                  {/* Card Top */}
+                  <div style={styles.cardTop}>
+                    <h3 style={styles.foodTitle}>{item.title}</h3>
+                    <span style={{ ...styles.statusBadge, color: badge.color, background: badge.bg }}>
+                      {badge.label}
+                    </span>
+                  </div>
 
-                <p style={styles.description}>{item.description}</p>
+                  {/* Details */}
+                  <div style={styles.detailsBox}>
+                    <span style={styles.chip}>📦 {item.quantity}</span>
+                    <span style={styles.chip}>{item.type === 'free' ? '🆓 Free' : `💰 ₹${item.price}`}</span>
+                    <span style={styles.chip}>⏰ {new Date(item.expiryTime).toLocaleDateString()}</span>
+                  </div>
 
-                <div style={styles.details}>
-                  <p>🆔 Listing ID: <span style={
-                    {fontFamily:'monospace', backgroundColor:'#e8f5e9', padding:'2px 6px', borderRadius:'4px', fontSize:'12px'}
-                  }>{item._id}</span></p>
-                  <p>📦 Quantity: {item.quantity}</p>
-                  <p>💰 Type: {item.type === 'free' ? 'Free' : `Paid - ₹${item.price}`}</p>
-                  <p>⏰ Expires: {new Date(item.expiryTime).toLocaleString()}</p>
-                  <p>📍 Address: {item.address}</p>
-                  <p>📞 Phone: {item.phone}</p>
-                  <p>📧 Contact: {item.contactEmail}</p>
-                  <p>🏪 Posted by: {item.postedBy?.name} ({item.postedBy?.email})</p>
-                  {item.claimedBy && <p>👤 Claimed by: {item.claimedBy?.name} ({item.claimedBy?.email})</p>}
-                </div>
+                  {/* Listing ID */}
+                  <div style={styles.idBox}>
+                    <span style={styles.idLabel}>ID</span>
+                    <span style={styles.idValue}>{item._id}</span>
+                  </div>
 
-                {ackStatus && (
-                  <div style={{
-                    ...styles.ackBox,
-                    backgroundColor: ackStatus.color + '22',
-                    borderLeft: `4px solid ${ackStatus.color}`
-                  }}>
-                    <p style={{ color: ackStatus.color, fontWeight: 'bold', margin: 0 }}>
-                      {ackStatus.text}
-                    </p>
-                    <div style={styles.ackChecks}>
-                      <span style={{ color: item.restaurantProvided ? '#2e7d32' : '#ccc' }}>
-                        🏪 Restaurant: {item.restaurantProvided ? '✅ Provided' : '⏳ Pending'}
-                      </span>
-                      <span style={{ color: item.volunteerPickedUp ? '#2e7d32' : '#ccc' }}>
-                        👤 Volunteer: {item.volunteerPickedUp ? '✅ Picked Up' : '⏳ Pending'}
-                      </span>
+                  {/* Restaurant Info */}
+                  <div style={styles.infoBox}>
+                    <div style={styles.infoRow}>
+                      <span style={styles.infoIcon}>🏪</span>
+                      <div style={styles.infoContent}>
+                        <span style={styles.infoName}>{item.postedBy?.name}</span>
+                        <span style={styles.infoSub}>{item.postedBy?.email}</span>
+                      </div>
                     </div>
+                    <div style={styles.infoRow}>
+                      <span style={styles.infoIcon}>📍</span>
+                      <span style={styles.infoSub}>{item.address}</span>
+                    </div>
+                    <div style={styles.infoRow}>
+                      <span style={styles.infoIcon}>📞</span>
+                      <span style={styles.infoSub}>{item.phone}</span>
+                    </div>
+                    {item.claimedBy && (
+                      <div style={{ ...styles.infoRow, marginTop: '8px', paddingTop: '8px', borderTop: '1px solid #F3F4F6' }}>
+                        <span style={styles.claimedTag}>Claimed by</span>
+                        <span style={styles.infoIcon}>👤</span>
+                        <div style={styles.infoContent}>
+                          <span style={styles.infoName}>{item.claimedBy?.name}</span>
+                          <span style={styles.infoSub}>{item.claimedBy?.email}</span>
+                        </div>
+                      </div>
+                    )}
                   </div>
-                )}
 
-                {!item.adminApproved && !item.adminRejected && (
-                  <div style={styles.btnRow}>
-                    <button style={styles.approveBtn} onClick={() => handleApprove(item._id)}>✅ Approve</button>
-                    <button style={styles.rejectBtn} onClick={() => handleReject(item._id)}>❌ Reject</button>
-                  </div>
-                )}
+                  {/* Ack Status */}
+                  {ack && (
+                    <div style={{ ...styles.ackBox, background: ack.bg, borderColor: ack.color + '40' }}>
+                      <div style={styles.ackRow}>
+                        <span style={{ color: ack.color, fontSize: '0.82rem', fontWeight: '600' }}>
+                          {ack.text}
+                        </span>
+                      </div>
+                      {(item.status === 'claimed' || item.status === 'completed') && (
+                        <div style={styles.ackChecks}>
+                          <span style={{ color: item.restaurantProvided ? '#16A34A' : '#9CA3AF', fontSize: '0.75rem' }}>
+                            {item.restaurantProvided ? '✅' : '○'} Restaurant provided
+                          </span>
+                          <span style={{ color: item.volunteerPickedUp ? '#16A34A' : '#9CA3AF', fontSize: '0.75rem' }}>
+                            {item.volunteerPickedUp ? '✅' : '○'} Volunteer picked up
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  )}
 
-                {item.restaurantProvided && item.volunteerPickedUp && !item.adminCompleted && (
-                  <button style={styles.completeBtn} onClick={() => handleComplete(item._id)}>
-                    🎉 Mark Transaction as Completed
-                  </button>
-                )}
+                  {/* Action Buttons */}
+                  {!item.adminApproved && !item.adminRejected && (
+                    <div style={styles.actionRow}>
+                      <button style={styles.approveBtn} onClick={() => handleApprove(item._id)}>
+                        ✅ Approve
+                      </button>
+                      <button style={styles.rejectBtn} onClick={() => handleReject(item._id)}>
+                        ❌ Reject
+                      </button>
+                    </div>
+                  )}
 
-                {item.adminCompleted && (
-                  <p style={styles.completedText}>🎉 Transaction Successfully Completed!</p>
-                )}
+                  {item.restaurantProvided && item.volunteerPickedUp && !item.adminCompleted && (
+                    <button style={styles.completeBtn} onClick={() => handleComplete(item._id)}>
+                      🎉 Mark Transaction as Completed
+                    </button>
+                  )}
 
-                {item.adminApproved && !item.adminRejected && (
-                  <p style={styles.approvedText}>✅ Approved</p>
-                )}
-                {item.adminRejected && (
-                  <p style={styles.rejectedText}>❌ Rejected</p>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      )}
+                  {item.adminCompleted && (
+                    <div style={styles.completedTag}>🎉 Transaction Successfully Completed!</div>
+                  )}
+
+                  {item.adminApproved && !item.adminRejected && !item.adminCompleted && (
+                    <div style={styles.approvedTag}>✅ Approved and Live</div>
+                  )}
+                  {item.adminRejected && (
+                    <div style={styles.rejectedTag}>❌ Rejected</div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
 
 const styles = {
-  container: { padding: '30px', backgroundColor: '#f1f8e9', minHeight: '100vh' },
-  header: { textAlign: 'center', marginBottom: '20px' },
-  title: { color: '#2e7d32', fontSize: '28px' },
-  subtitle: { color: '#666', fontSize: '15px' },
-  statsRow: { display: 'flex', gap: '15px', justifyContent: 'center', marginBottom: '20px', flexWrap: 'wrap' },
-  statBox: { backgroundColor: 'white', borderRadius: '12px', padding: '15px 25px', textAlign: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', minWidth: '120px' },
-  statNum: { fontSize: '28px', fontWeight: 'bold', color: '#2e7d32', margin: 0 },
-  statLabel: { fontSize: '12px', color: '#888', margin: 0 },
-  filterRow: { display: 'flex', gap: '10px', justifyContent: 'center', marginBottom: '20px', flexWrap: 'wrap' },
-  filterBtn: { padding: '8px 16px', border: '2px solid #2e7d32', borderRadius: '20px', cursor: 'pointer', fontSize: '13px', fontWeight: 'bold' },
-  grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: '20px', maxWidth: '1200px', margin: '0 auto' },
-  card: { backgroundColor: 'white', borderRadius: '12px', padding: '20px', boxShadow: '0 2px 12px rgba(0,0,0,0.1)' },
-  cardTop: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '10px', gap: '10px' },
-  foodTitle: { color: '#1b5e20', fontSize: '18px', margin: 0 },
-  badge: { color: 'white', padding: '4px 10px', borderRadius: '20px', fontSize: '11px', fontWeight: 'bold', whiteSpace: 'nowrap' },
-  description: { color: '#555', fontSize: '14px', marginBottom: '10px' },
-  details: { backgroundColor: '#f9fbe7', padding: '10px', borderRadius: '8px', fontSize: '13px', color: '#444', marginBottom: '15px', lineHeight: '1.8' },
-  ackBox: { padding: '10px', borderRadius: '8px', marginBottom: '15px' },
-  ackChecks: { display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '8px', fontSize: '13px' },
-  btnRow: { display: 'flex', gap: '10px', marginBottom: '10px' },
-  approveBtn: { flex: 1, padding: '10px', backgroundColor: '#2e7d32', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '14px' },
-  rejectBtn: { flex: 1, padding: '10px', backgroundColor: '#c62828', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '14px' },
-  completeBtn: { width: '100%', padding: '12px', backgroundColor: '#6a1b9a', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '14px', fontWeight: 'bold' },
-  completedText: { color: '#2e7d32', fontWeight: 'bold', textAlign: 'center', fontSize: '15px' },
-  approvedText: { color: '#2e7d32', fontWeight: 'bold', textAlign: 'center', fontSize: '13px' },
-  rejectedText: { color: '#c62828', fontWeight: 'bold', textAlign: 'center', fontSize: '13px' },
-  message: { textAlign: 'center', padding: '10px', marginBottom: '20px', backgroundColor: '#e8f5e9', borderRadius: '8px', color: '#2e7d32', maxWidth: '400px', margin: '0 auto 20px' },
-  empty: { textAlign: 'center', padding: '60px', color: '#666' },
-  center: { textAlign: 'center', padding: '60px' },
+  page: { minHeight: '100vh', background: '#FAFAFA', paddingTop: '64px' },
+  wrap: { maxWidth: '1200px', margin: '0 auto', padding: '40px 24px' },
+  loadingPage: { minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '16px', paddingTop: '64px' },
+  spinner: { width: '36px', height: '36px', border: '3px solid #F3F4F6', borderTop: '3px solid #FF5200', borderRadius: '50%', animation: 'spin 0.8s linear infinite' },
+  loadingText: { color: '#9CA3AF', fontSize: '0.9rem' },
+  header: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '28px', gap: '16px' },
+  title: { fontSize: '1.8rem', fontWeight: '800', color: '#1C1C1C', letterSpacing: '-0.02em', marginBottom: '4px' },
+  sub: { fontSize: '0.9rem', color: '#9CA3AF' },
+  adminBadge: { padding: '8px 16px', borderRadius: '10px', background: 'linear-gradient(135deg, #1C1C1C, #2D2D2D)', color: 'white', fontSize: '0.85rem', fontWeight: '700' },
+  statsGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '12px', marginBottom: '24px' },
+  statCard: { background: 'white', borderRadius: '12px', padding: '18px 16px', textAlign: 'center', border: '1px solid #F0F0F0', boxShadow: '0 1px 4px rgba(0,0,0,0.04)', transition: 'transform 0.15s' },
+  statIcon: { fontSize: '1.4rem', marginBottom: '8px', display: 'block' },
+  statNum: { display: 'block', fontSize: '1.8rem', fontWeight: '800', color: '#FF5200', lineHeight: 1, marginBottom: '4px' },
+  statLbl: { display: 'block', fontSize: '0.7rem', color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.06em' },
+  tabsWrap: { display: 'flex', gap: '5px', marginBottom: '20px', flexWrap: 'wrap', background: 'white', padding: '4px', borderRadius: '12px', border: '1px solid #E5E7EB', width: 'fit-content' },
+  tab: { padding: '8px 13px', borderRadius: '8px', border: 'none', background: 'transparent', fontSize: '0.82rem', fontWeight: '600', color: '#6B7280', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', transition: 'all 0.15s' },
+  tabActive: { background: '#FF5200', color: 'white', boxShadow: '0 2px 8px rgba(255,82,0,0.25)' },
+  tabCount: { fontSize: '0.68rem', fontWeight: '700', padding: '1px 7px', borderRadius: '20px' },
+  msgBox: { padding: '12px 16px', borderRadius: '10px', border: '1px solid', fontSize: '0.88rem', fontWeight: '500', marginBottom: '20px' },
+  empty: { background: 'white', borderRadius: '16px', padding: '64px 24px', textAlign: 'center', border: '1px solid #F0F0F0' },
+  emptyIcon: { fontSize: '2.5rem', marginBottom: '12px' },
+  emptyTitle: { fontSize: '1.1rem', fontWeight: '700', color: '#1C1C1C', marginBottom: '6px' },
+  emptySub: { fontSize: '0.88rem', color: '#9CA3AF' },
+  grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: '18px' },
+  card: { background: 'white', borderRadius: '16px', padding: '20px', border: '1px solid #F0F0F0', boxShadow: '0 2px 12px rgba(0,0,0,0.05)', display: 'flex', flexDirection: 'column', gap: '12px' },
+  cardTop: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '10px' },
+  foodTitle: { fontSize: '1.05rem', fontWeight: '700', color: '#1C1C1C', margin: 0, letterSpacing: '-0.01em' },
+  statusBadge: { fontSize: '0.72rem', fontWeight: '700', padding: '4px 10px', borderRadius: '20px', whiteSpace: 'nowrap', flexShrink: 0 },
+  detailsBox: { display: 'flex', gap: '6px', flexWrap: 'wrap' },
+  chip: { fontSize: '0.75rem', color: '#374151', background: '#F9FAFB', padding: '4px 10px', borderRadius: '6px', border: '1px solid #E5E7EB', fontWeight: '500' },
+  idBox: { background: '#F9FAFB', borderRadius: '8px', padding: '8px 12px', display: 'flex', alignItems: 'center', gap: '8px', border: '1px solid #E5E7EB' },
+  idLabel: { fontSize: '0.65rem', fontWeight: '700', color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.08em', flexShrink: 0 },
+  idValue: { fontSize: '0.72rem', color: '#374151', fontFamily: 'monospace', wordBreak: 'break-all' },
+  infoBox: { background: '#F9FAFB', borderRadius: '10px', padding: '12px', border: '1px solid #E5E7EB' },
+  infoRow: { display: 'flex', alignItems: 'flex-start', gap: '8px', marginBottom: '6px' },
+  infoIcon: { fontSize: '0.85rem', flexShrink: 0, marginTop: '1px' },
+  infoContent: { display: 'flex', flexDirection: 'column', flex: 1 },
+  infoName: { fontSize: '0.84rem', fontWeight: '600', color: '#1C1C1C' },
+  infoSub: { fontSize: '0.74rem', color: '#9CA3AF' },
+  claimedTag: { fontSize: '0.62rem', fontWeight: '700', color: '#2563EB', background: '#EFF6FF', padding: '2px 8px', borderRadius: '10px', flexShrink: 0 },
+  ackBox: { padding: '10px 13px', borderRadius: '8px', border: '1px solid' },
+  ackRow: { marginBottom: '6px' },
+  ackChecks: { display: 'flex', flexDirection: 'column', gap: '3px' },
+  actionRow: { display: 'flex', gap: '8px' },
+  approveBtn: { flex: 1, padding: '10px', background: '#16A34A', color: 'white', border: 'none', borderRadius: '9px', fontSize: '0.84rem', fontWeight: '600', cursor: 'pointer' },
+  rejectBtn: { flex: 1, padding: '10px', background: '#DC2626', color: 'white', border: 'none', borderRadius: '9px', fontSize: '0.84rem', fontWeight: '600', cursor: 'pointer' },
+  completeBtn: { width: '100%', padding: '12px', background: 'linear-gradient(135deg, #7C3AED, #9333EA)', color: 'white', border: 'none', borderRadius: '10px', fontSize: '0.88rem', fontWeight: '700', cursor: 'pointer' },
+  completedTag: { textAlign: 'center', fontSize: '0.84rem', color: '#16A34A', fontWeight: '700', padding: '10px', background: '#F0FDF4', borderRadius: '8px' },
+  approvedTag: { textAlign: 'center', fontSize: '0.8rem', color: '#16A34A', fontWeight: '600', padding: '8px', background: '#F0FDF4', borderRadius: '8px' },
+  rejectedTag: { textAlign: 'center', fontSize: '0.8rem', color: '#DC2626', fontWeight: '600', padding: '8px', background: '#FEF2F2', borderRadius: '8px' },
 };
 
 export default AdminPanel;
