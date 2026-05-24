@@ -252,22 +252,42 @@ exports.restaurantReject = async (req, res) => {
       .populate('claimedBy', 'name email');
 
     if (!food) return res.status(404).json({ message: 'Listing not found' });
-    if (food.postedBy.toString() !== req.user.id) return res.status(403).json({ message: 'Not authorized' });
+    if (food.postedBy.toString() !== req.user.id)
+      return res.status(403).json({ message: 'Not authorized' });
+
+    // Save claimedBy before clearing it
+    const claimedBy = food.claimedBy;
 
     // Real Stripe refund
     if (food.paymentDone && food.paymentId) {
-      await createRefund(food.paymentId);
+      try {
+        await createRefund(food.paymentId);
+        if (claimedBy) {
+          await sendRefundNotification({
+            volunteerEmail: claimedBy.email,
+            volunteerName: claimedBy.name,
+            foodTitle: food.title,
+            amount: food.price,
+            paymentId: food.paymentId,
+          });
+        }
+      } catch (refundErr) {
+        console.error('Refund/email error:', refundErr.message);
+        // Continue even if email fails
+      }
+    }
 
-      // Send refund email to volunteer
-      await sendRefundNotification({
-        volunteerEmail: food.claimedBy.email,
-        volunteerName: food.claimedBy.name,
-        foodTitle: food.title,
-        amount: food.price,
-        paymentId: food.paymentId,
+    // Notify volunteer BEFORE clearing claimedBy
+    if (claimedBy) {
+      await createNotification({
+        recipient: claimedBy._id,
+        message: `❌ Your claim for "${food.title}" has been rejected by the restaurant.${food.paymentDone ? ' Your payment has been refunded.' : ''}`,
+        type: 'claim_rejected',
+        listingId: food._id
       });
     }
 
+    // Now clear the fields
     food.restaurantRejected = true;
     food.restaurantApproved = false;
     food.status = 'available';
@@ -277,15 +297,10 @@ exports.restaurantReject = async (req, res) => {
     food.paymentIntentId = null;
 
     await food.save();
-    // Notify volunteer
-  await createNotification({
-    recipient: food.claimedBy,
-    message: `❌ Your claim for "${food.title}" has been rejected by the restaurant. ${food.paymentDone ? 'Your payment has been refunded.' : ''}`,
-    type: 'claim_rejected',
-    listingId: food._id
-  });
+
     res.json({ message: 'Claim rejected and payment refunded!', food });
   } catch (err) {
+    console.error('restaurantReject error:', err);
     res.status(400).json({ message: err.message });
   }
 };
