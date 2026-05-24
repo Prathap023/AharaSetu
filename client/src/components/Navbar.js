@@ -68,7 +68,7 @@ function Navbar() {
                       ...(isActive('/contact') ? styles.navLinkActive : {})
                     }}>Contact</Link>
                     <a
-                      href="https://aharasetu.in"
+                      href="https://aharasetu-report.onrender.com/"
                       // target="_blank"
                       rel="noopener noreferrer"
                       style={{
@@ -76,7 +76,7 @@ function Navbar() {
                         ...(isActive('/about') ? styles.navLinkActive : {})
                       }}
                     >
-                      About Us
+                      What We have done
                     </a>
                   </>
                 )}
