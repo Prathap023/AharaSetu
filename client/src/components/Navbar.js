@@ -162,17 +162,7 @@ function Navbar() {
             <>
               <Link to="/" style={styles.mobileLink} onClick={() => setMenuOpen(false)}>🍱 Browse Food</Link>
               <Link to="/contact" style={styles.mobileLink} onClick={() => setMenuOpen(false)}>📬 Contact</Link>
-              <a
-                      href="https://aharasetu-report.onrender.com/"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{
-                        ...styles.navLink,
-                        ...(isActive('/about') ? styles.navLinkActive : {})
-                      }}
-                    >
-                      What We have done
-                    </a>
+              <Link to="https://aharasetu-report.onrender.com/" target="_blank" rel="noopener noreferrer" style={styles.mobileLink} onClick={() => setMenuOpen(false)}>What We have done</Link>
               <Link to="/login" style={styles.mobileLink} onClick={() => setMenuOpen(false)}>Login</Link>
               <Link to="/register" style={styles.mobileRegister} onClick={() => setMenuOpen(false)}>Sign Up</Link>
             </>
