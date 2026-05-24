@@ -16,7 +16,7 @@ function Home() {
 
   const fetchListings = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/food');
+      const res = await axios.get('https://aharasetu-backend-pov2.onrender.com/api/food');
       setListings(res.data);
       fetchRatings(res.data);
     } catch (err) { console.error(err); }
@@ -28,7 +28,7 @@ function Home() {
     for (const item of listings) {
       try {
         const res = await axios.get(
-          `http://localhost:5000/api/ratings/average/${item.postedBy._id}`
+          `https://aharasetu-backend-pov2.onrender.com/api/ratings/average/${item.postedBy._id}`
         );
         ratings[item.postedBy._id] = res.data;
       } catch (err) {}
@@ -49,7 +49,7 @@ function Home() {
     }
     try {
       const res = await axios.put(
-        `http://localhost:5000/api/food/claim/${item._id}`, {},
+        `https://aharasetu-backend-pov2.onrender.com/api/food/claim/${item._id}`, {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
       if (item.type === 'paid') {

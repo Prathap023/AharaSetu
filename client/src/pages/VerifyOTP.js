@@ -42,7 +42,7 @@ function VerifyOTP() {
     if (otpString.length !== 6) { setError('Please enter all 6 digits'); return; }
     setLoading(true); setError('');
     try {
-      await axios.post('http://localhost:5000/api/auth/verify-otp', { email, otp: otpString });
+      await axios.post('https://aharasetu-backend-pov2.onrender.com/api/auth/verify-otp', { email, otp: otpString });
       setMessage('✅ Email verified!');
       setTimeout(() => navigate('/login'), 1500);
     } catch (err) {
@@ -54,7 +54,7 @@ function VerifyOTP() {
   const handleResend = async () => {
     setResendLoading(true); setError('');
     try {
-      await axios.post('http://localhost:5000/api/auth/resend-otp', { email });
+      await axios.post('https://aharasetu-backend-pov2.onrender.com/api/auth/resend-otp', { email });
       setMessage('✅ New OTP sent!');
       setTimer(600); setOtp(['', '', '', '', '', '']);
     } catch (err) {

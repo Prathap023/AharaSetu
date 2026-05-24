@@ -67,6 +67,17 @@ function Navbar() {
                       ...styles.navLink,
                       ...(isActive('/contact') ? styles.navLinkActive : {})
                     }}>Contact</Link>
+                    <a
+                      href="https://aharasetu.in"
+                      // target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        ...styles.navLink,
+                        ...(isActive('/about') ? styles.navLinkActive : {})
+                      }}
+                    >
+                      About Us
+                    </a>
                   </>
                 )}
               </>

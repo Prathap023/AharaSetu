@@ -22,7 +22,7 @@ function Dashboard() {
     e.preventDefault();
     setLoading(true);
     try {
-      await axios.post('http://localhost:5000/api/food', form, {
+      await axios.post('https://aharasetu-backend-pov2.onrender.com/api/food', form, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setMessage('success');

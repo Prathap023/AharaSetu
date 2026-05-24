@@ -17,7 +17,7 @@ function ResetPassword() {
     if (password.length < 6) { setError('Password must be at least 6 characters'); return; }
     setLoading(true); setError('');
     try {
-      await axios.post(`http://localhost:5000/api/auth/reset-password/${token}`, { password });
+      await axios.post(`https://aharasetu-backend-pov2.onrender.com/api/auth/reset-password/${token}`, { password });
       setDone(true);
       setTimeout(() => navigate('/login'), 3000);
     } catch (err) {

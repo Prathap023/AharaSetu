@@ -12,7 +12,7 @@ function ForgotPassword() {
     e.preventDefault();
     setLoading(true); setError('');
     try {
-      await axios.post('http://localhost:5000/api/auth/forgot-password', { email });
+      await axios.post('https://aharasetu-backend-pov2.onrender.com/api/auth/forgot-password', { email });
       setSent(true);
     } catch (err) {
       setError(err.response?.data?.message || 'Something went wrong');

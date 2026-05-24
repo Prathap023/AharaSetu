@@ -23,7 +23,7 @@ function MyListings() {
 
   const fetchListings = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/food/my-listings', {
+      const res = await axios.get('https://aharasetu-backend-pov2.onrender.com/api/food/my-listings', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setListings(res.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)));
@@ -35,7 +35,7 @@ function MyListings() {
     try {
       const userId = user._id || user.id;
       const res = await axios.get(
-        `http://localhost:5000/api/ratings/restaurant/${userId}`,
+        `https://aharasetu-backend-pov2.onrender.com/api/ratings/restaurant/${userId}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       const data = {};
@@ -48,7 +48,7 @@ function MyListings() {
 
   const handleApprove = async (id) => {
     try {
-      await axios.put(`http://localhost:5000/api/food/approve-claim/${id}`, {},
+      await axios.put(`https://aharasetu-backend-pov2.onrender.com/api/food/approve-claim/${id}`, {},
         { headers: { Authorization: `Bearer ${token}` } });
       setMessage('✅ Claim approved!');
       fetchListings();
@@ -57,7 +57,7 @@ function MyListings() {
 
   const handleReject = async (id) => {
     try {
-      await axios.put(`http://localhost:5000/api/food/reject-claim/${id}`, {},
+      await axios.put(`https://aharasetu-backend-pov2.onrender.com/api/food/reject-claim/${id}`, {},
         { headers: { Authorization: `Bearer ${token}` } });
       setMessage('✅ Claim rejected and payment refunded!');
       fetchListings();
@@ -66,7 +66,7 @@ function MyListings() {
 
   const handleProvided = async (id) => {
     try {
-      await axios.put(`http://localhost:5000/api/food/restaurant-provided/${id}`, {},
+      await axios.put(`https://aharasetu-backend-pov2.onrender.com/api/food/restaurant-provided/${id}`, {},
         { headers: { Authorization: `Bearer ${token}` } });
       setMessage('✅ Marked as provided!');
       fetchListings();
@@ -250,7 +250,7 @@ function MyListings() {
                     <div style={styles.detailsBox}>
                       <span style={styles.detailChip}>📦 {item.quantity}</span>
                       <span style={styles.detailChip}>
-                        {item.type === 'free' ? '🆓 Free' : `💰 ₹${item.price}`}
+                        {item.type === 'free' ? '🆓 Free' :  `💰 ₹${item.price}`}
                       </span>
                       <span style={styles.detailChip}>
                         ⏰ {new Date(item.expiryTime).toLocaleDateString()}

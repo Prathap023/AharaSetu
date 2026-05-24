@@ -1,0 +1,2663 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aharasetu - The Bridge</title>
+    <!-- <title>AharaSetu — Phase 1 Project Report</title> -->
+    <link rel="icon" type="image/png" href="AharaSetu-logo-round.png" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --orange: #FF5200;
+            --orange2: #FF6B35;
+            --orange3: #FF8C00;
+            --orange-light: #FFF0EB;
+            --orange-pale: #FFF8F5;
+            --black: #1C1C1C;
+            --black2: #2D2D2D;
+            --gray: #6B6B6B;
+            --gray2: #9CA3AF;
+            --gray3: #E5E7EB;
+            --gray4: #F3F4F6;
+            --white: #FFFFFF;
+            --off-white: #FAFAFA;
+            --border: #E5E7EB;
+            --green: #16A34A;
+            --green-bg: #F0FDF4;
+            --blue: #2563EB;
+            --blue-bg: #EFF6FF;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 4px 16px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.10);
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--off-white);
+            color: var(--black);
+            line-height: 1.65;
+            overflow-x: hidden;
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--gray4);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--orange);
+            border-radius: 3px;
+        }
+
+        /* NAV */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.97);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 32px;
+            height: 58px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 1px 12px rgba(0, 0, 0, 0.06);
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .nav-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 9px;
+            background: linear-gradient(135deg, var(--orange), var(--orange3));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .nav-name {
+            font-size: 1rem;
+            font-weight: 800;
+            color: var(--black);
+            letter-spacing: -0.02em;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2px;
+        }
+
+        .nav-links a {
+            padding: 5px 10px;
+            border-radius: 7px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: var(--gray);
+            text-decoration: none;
+            transition: all 0.15s;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .nav-links a:hover {
+            color: var(--orange);
+            background: var(--orange-light);
+        }
+
+        .nav-badge {
+            background: var(--orange);
+            color: white;
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 20px;
+            letter-spacing: 0.06em;
+        }
+
+        /* HERO */
+        .hero {
+            min-height: 100vh;
+            background: linear-gradient(145deg, #1C1C1C 0%, #2D2D2D 60%, #1a1a1a 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 100px 32px 80px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at 30% 50%, rgba(255, 82, 0, 0.12) 0%, transparent 60%),
+                radial-gradient(ellipse at 70% 30%, rgba(255, 140, 0, 0.08) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .hero-grid {
+            position: absolute;
+            inset: 0;
+            background-image: linear-gradient(rgba(255, 82, 0, 0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 82, 0, 0.04) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+        }
+
+        .hero-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 82, 0, 0.15);
+            border: 1px solid rgba(255, 82, 0, 0.3);
+            color: #FF8C00;
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 5px 14px;
+            border-radius: 20px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-bottom: 28px;
+            position: relative;
+        }
+
+        .eyebrow-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--orange);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1)
+            }
+
+            50% {
+                opacity: 0.5;
+                transform: scale(1.4)
+            }
+        }
+
+        .hero h1 {
+            font-size: clamp(3rem, 8vw, 6rem);
+            font-weight: 800;
+            color: white;
+            line-height: 0.95;
+            letter-spacing: -0.04em;
+            margin-bottom: 8px;
+            position: relative;
+        }
+
+        .hero h1 span {
+            color: var(--orange);
+        }
+
+        .hero-sub-title {
+            font-size: clamp(1rem, 2.5vw, 1.4rem);
+            color: rgba(255, 255, 255, 0.35);
+            font-weight: 300;
+            margin-bottom: 48px;
+            position: relative;
+            letter-spacing: -0.01em;
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 1px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 14px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .hero-stat {
+            padding: 18px 28px;
+            text-align: center;
+            transition: background 0.2s;
+        }
+
+        .hero-stat:hover {
+            background: rgba(255, 82, 0, 0.1);
+        }
+
+        .hero-stat+.hero-stat {
+            border-left: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .stat-val {
+            display: block;
+            font-size: 1.9rem;
+            font-weight: 800;
+            color: var(--orange);
+            line-height: 1;
+            letter-spacing: -0.03em;
+        }
+
+        .stat-lbl {
+            display: block;
+            font-size: 0.65rem;
+            color: rgba(255, 255, 255, 0.35);
+            margin-top: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .hero-developer {
+            position: absolute;
+            bottom: 3%;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .dev-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--orange), var(--orange3));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            font-weight: 800;
+            color: white;
+        }
+
+        .dev-info {
+            text-align: left;
+        }
+
+        .dev-name {
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .dev-role {
+            font-size: 0.68rem;
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        /* MAIN */
+        main {
+            max-width: 1080px;
+            margin: 0 auto;
+            padding: 0 28px;
+        }
+
+        /* SECTION */
+        section {
+            padding: 80px 0;
+        }
+
+        .section-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--orange);
+            margin-bottom: 12px;
+        }
+
+        .section-tag::before {
+            content: '';
+            width: 20px;
+            height: 2px;
+            background: var(--orange);
+            border-radius: 1px;
+        }
+
+        h2 {
+            font-size: clamp(1.7rem, 4vw, 2.4rem);
+            font-weight: 800;
+            color: var(--black);
+            letter-spacing: -0.03em;
+            line-height: 1.15;
+            margin-bottom: 16px;
+        }
+
+        h2 em {
+            color: var(--orange);
+            font-style: normal;
+        }
+
+        h3 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--black);
+            margin: 36px 0 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        h3::before {
+            content: '';
+            width: 3px;
+            height: 18px;
+            background: var(--orange);
+            border-radius: 2px;
+            flex-shrink: 0;
+        }
+
+        p {
+            color: var(--gray);
+            line-height: 1.75;
+            margin-bottom: 14px;
+            font-size: 0.95rem;
+        }
+
+        .divider {
+            height: 1px;
+            background: var(--border);
+            margin: 0;
+        }
+
+        /* HIGHLIGHT BOX */
+        .highlight {
+            background: linear-gradient(135deg, var(--orange-light), var(--orange-pale));
+            border: 1px solid rgba(255, 82, 0, 0.2);
+            border-left: 3px solid var(--orange);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 20px 0;
+        }
+
+        .highlight p {
+            color: var(--black2);
+            font-size: 0.92rem;
+            margin: 0;
+            font-weight: 500;
+        }
+
+        /* CARD GRID */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 14px;
+            margin-top: 24px;
+        }
+
+        .card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(to right, var(--orange), var(--orange3));
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .card:hover::after {
+            transform: scaleX(1);
+        }
+
+        .card-icon {
+            font-size: 1.6rem;
+            margin-bottom: 10px;
+        }
+
+        .card h4 {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: var(--black);
+            margin-bottom: 5px;
+        }
+
+        .card p {
+            font-size: 0.8rem;
+            color: var(--gray2);
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        /* TABLE */
+        .table-wrap {
+            overflow-x: auto;
+            margin: 16px 0;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            font-size: 0.855rem;
+        }
+
+        thead {
+            background: var(--black);
+        }
+
+        thead th {
+            padding: 13px 16px;
+            text-align: left;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        thead th:first-child {
+            border-radius: 12px 0 0 0;
+        }
+
+        thead th:last-child {
+            border-radius: 0 12px 0 0;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid var(--gray4);
+            transition: background 0.12s;
+        }
+
+        tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        tbody tr:hover {
+            background: var(--orange-pale);
+        }
+
+        tbody td {
+            padding: 11px 16px;
+            color: var(--gray);
+            vertical-align: top;
+            line-height: 1.5;
+        }
+
+        tbody td:first-child {
+            color: var(--black);
+            font-weight: 600;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.68rem;
+            font-weight: 700;
+            padding: 3px 9px;
+            border-radius: 20px;
+        }
+
+        .b-done {
+            background: var(--green-bg);
+            color: var(--green);
+        }
+
+        .b-high {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .b-med {
+            background: var(--blue-bg);
+            color: var(--blue);
+        }
+
+        .b-low {
+            background: var(--gray4);
+            color: var(--gray);
+        }
+
+        /* TECH GRID */
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(185px, 1fr));
+            gap: 11px;
+            margin-top: 20px;
+        }
+
+        .tech-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px 18px;
+            box-shadow: var(--shadow);
+            transition: all 0.2s;
+        }
+
+        .tech-card:hover {
+            border-color: var(--orange);
+            transform: translateY(-2px);
+        }
+
+        .tech-layer {
+            font-size: 0.62rem;
+            font-weight: 700;
+            color: var(--orange);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 4px;
+        }
+
+        .tech-name {
+            font-size: 0.95rem;
+            color: var(--black);
+            font-weight: 700;
+            margin-bottom: 3px;
+        }
+
+        .tech-desc {
+            font-size: 0.76rem;
+            color: var(--gray2);
+        }
+
+        /* ROLE CARDS */
+        .role-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(185px, 1fr));
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .role-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 18px;
+            box-shadow: var(--shadow);
+            transition: all 0.2s;
+        }
+
+        .role-card:hover {
+            border-color: var(--orange);
+            transform: translateY(-2px);
+        }
+
+        .role-icon {
+            font-size: 1.6rem;
+            margin-bottom: 8px;
+        }
+
+        .role-name {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: var(--orange);
+            margin-bottom: 10px;
+        }
+
+        .role-card ul {
+            list-style: none;
+        }
+
+        .role-card ul li {
+            font-size: 0.76rem;
+            color: var(--gray);
+            padding: 3px 0;
+            display: flex;
+            gap: 6px;
+            border-bottom: 1px solid var(--gray4);
+        }
+
+        .role-card ul li:last-child {
+            border-bottom: none;
+        }
+
+        .role-card ul li::before {
+            content: '→';
+            color: var(--orange);
+            font-size: 0.7rem;
+            flex-shrink: 0;
+        }
+
+        /* TIMELINE */
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+            margin-top: 22px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 5px;
+            top: 6px;
+            bottom: 6px;
+            width: 2px;
+            background: linear-gradient(to bottom, var(--orange), var(--orange-light));
+            border-radius: 1px;
+        }
+
+        .tl-item {
+            position: relative;
+            margin-bottom: 18px;
+        }
+
+        .tl-item::before {
+            content: '';
+            position: absolute;
+            left: -27px;
+            top: 8px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--orange);
+            border: 2px solid white;
+            box-shadow: 0 0 0 2px var(--orange);
+        }
+
+        .tl-week {
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: var(--orange);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 5px;
+        }
+
+        .tl-content {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            padding: 12px 15px;
+            font-size: 0.86rem;
+            color: var(--gray);
+            box-shadow: var(--shadow);
+            transition: border-color 0.2s;
+        }
+
+        .tl-item:hover .tl-content {
+            border-color: var(--orange);
+        }
+
+        /* FLOW */
+        .flow-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 14px;
+        }
+
+        .flow-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            padding: 12px 14px;
+            box-shadow: var(--shadow);
+            transition: border-color 0.15s;
+        }
+
+        .flow-step:hover {
+            border-color: var(--orange);
+        }
+
+        .flow-num {
+            min-width: 26px;
+            height: 26px;
+            border-radius: 8px;
+            background: var(--orange-light);
+            border: 1px solid rgba(255, 82, 0, 0.2);
+            color: var(--orange);
+            font-size: 0.75rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .flow-text {
+            font-size: 0.86rem;
+            color: var(--gray);
+            padding-top: 3px;
+        }
+
+        /* SCHEMA */
+        .schema-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+            gap: 14px;
+            margin-top: 20px;
+        }
+
+        .schema-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .schema-head {
+            background: var(--black);
+            padding: 13px 18px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .schema-field {
+            padding: 9px 16px;
+            border-bottom: 1px solid var(--gray4);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            transition: background 0.12s;
+        }
+
+        .schema-field:hover {
+            background: var(--orange-pale);
+        }
+
+        .schema-field:last-child {
+            border-bottom: none;
+        }
+
+        .sf-name {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.76rem;
+            color: var(--orange);
+            font-weight: 500;
+        }
+
+        .sf-type {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.7rem;
+            color: var(--gray2);
+        }
+
+        /* ENDPOINTS */
+        .endpoint {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px 13px;
+            margin-bottom: 5px;
+            box-shadow: var(--shadow);
+            transition: border-color 0.15s;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.8rem;
+        }
+
+        .endpoint:hover {
+            border-color: var(--orange);
+        }
+
+        .method {
+            font-size: 0.62rem;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 5px;
+            min-width: 42px;
+            text-align: center;
+        }
+
+        .get {
+            background: #DCFCE7;
+            color: #16A34A;
+        }
+
+        .post {
+            background: #DBEAFE;
+            color: #2563EB;
+        }
+
+        .put {
+            background: #FEF3C7;
+            color: #D97706;
+        }
+
+        .del {
+            background: #FEE2E2;
+            color: #DC2626;
+        }
+
+        .ep-path {
+            color: var(--black);
+            flex: 1;
+        }
+
+        .ep-desc {
+            font-size: 0.72rem;
+            color: var(--gray2);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .access {
+            font-size: 0.62rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+            letter-spacing: 0.03em;
+            white-space: nowrap;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 700;
+        }
+
+        .a-pub {
+            background: #DCFCE7;
+            color: #16A34A;
+        }
+
+        .a-res {
+            background: #FEF3C7;
+            color: #D97706;
+        }
+
+        .a-vol {
+            background: #DBEAFE;
+            color: #2563EB;
+        }
+
+        .a-adm {
+            background: #FEE2E2;
+            color: #DC2626;
+        }
+
+        /* TESTING */
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(265px, 1fr));
+            gap: 8px;
+            margin-top: 18px;
+        }
+
+        .test-item {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px 13px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.83rem;
+            color: var(--gray);
+            box-shadow: var(--shadow);
+            transition: border-color 0.15s;
+        }
+
+        .test-item:hover {
+            border-color: #BBF7D0;
+        }
+
+        .test-pass {
+            color: var(--green);
+            font-size: 0.72rem;
+            font-weight: 700;
+            flex-shrink: 0;
+            background: var(--green-bg);
+            padding: 2px 7px;
+            border-radius: 5px;
+        }
+
+        /* NOTIF GRID */
+        .notif-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        .notif-item {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 11px 13px;
+            box-shadow: var(--shadow);
+            transition: border-color 0.15s;
+        }
+
+        .notif-item:hover {
+            border-color: var(--orange);
+        }
+
+        .notif-trigger {
+            font-size: 0.82rem;
+            color: var(--black);
+            margin-bottom: 3px;
+            font-weight: 600;
+        }
+
+        .notif-recipient {
+            font-size: 0.74rem;
+            color: var(--orange);
+            font-weight: 500;
+        }
+
+        /* PHASE 2 */
+        .p2-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .p2-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .p2-card::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(to right, var(--orange), var(--orange3));
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s;
+        }
+
+        .p2-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .p2-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .p2-icon {
+            font-size: 1.6rem;
+            margin-bottom: 8px;
+        }
+
+        .p2-card h4 {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: var(--black);
+            margin-bottom: 5px;
+        }
+
+        .p2-card p {
+            font-size: 0.78rem;
+            color: var(--gray2);
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        .p2-priority {
+            position: absolute;
+            top: 13px;
+            right: 13px;
+            font-size: 0.6rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+
+        /* REVEAL */
+        .reveal {
+            opacity: 0;
+            transform: translateY(16px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        .reveal.in {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* FOOTER */
+        footer {
+            background: var(--black);
+            padding: 48px 32px;
+            text-align: center;
+        }
+
+        .footer-brand {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .footer-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--orange), var(--orange3));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .footer-name {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: white;
+            letter-spacing: -0.02em;
+        }
+
+        footer p {
+            font-size: 0.78rem;
+            color: rgba(255, 255, 255, 0.3);
+            margin-bottom: 16px;
+        }
+
+        .footer-tags {
+            display: flex;
+            gap: 7px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .footer-tag {
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            padding: 3px 10px;
+            font-size: 0.65rem;
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* DEVELOPER CARD */
+        .dev-card {
+            background: linear-gradient(135deg, var(--black), var(--black2));
+            border-radius: 16px;
+            padding: 28px 32px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-top: 24px;
+            border: 1px solid rgba(255, 82, 0, 0.2);
+        }
+
+        .dev-card-avatar {
+            width: 64px;
+            height: 64px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, var(--orange), var(--orange3));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: white;
+            flex-shrink: 0;
+            box-shadow: 0 4px 16px rgba(255, 82, 0, 0.3);
+        }
+
+        .dev-card-info h4 {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 4px;
+        }
+
+        .dev-card-info p {
+            font-size: 0.82rem;
+            color: rgba(255, 255, 255, 0.4);
+            margin: 0;
+        }
+
+        .dev-tags {
+            display: flex;
+            gap: 6px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .dev-tag {
+            font-size: 0.68rem;
+            font-weight: 600;
+            padding: 3px 10px;
+            border-radius: 20px;
+            background: rgba(255, 82, 0, 0.15);
+            color: var(--orange);
+            border: 1px solid rgba(255, 82, 0, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            nav {
+                padding: 0 16px;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            main {
+                padding: 0 16px;
+            }
+
+            .hero {
+                padding: 80px 20px 60px;
+            }
+
+            .hero-stats {
+                flex-direction: column;
+            }
+
+            .hero-stat+.hero-stat {
+                border-left: none;
+                border-top: 1px solid rgba(255, 255, 255, 0.08);
+            }
+
+            .endpoint {
+                flex-wrap: wrap;
+            }
+
+            .ep-desc {
+                display: none;
+            }
+
+            .dev-card {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .dev-tags {
+                justify-content: center;
+            }
+        }
+
+        /* Hamburger */
+        .hamburger {
+            display: none;
+            font-size: 1.8rem;
+            cursor: pointer;
+            color: var(--black);
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+
+            nav {
+                padding: 0 16px;
+            }
+
+            .hamburger {
+                display: block;
+            }
+
+            .nav-links {
+                position: absolute;
+                top: 58px;
+                left: 0;
+                width: 100%;
+                background: white;
+                flex-direction: column;
+                padding: 16px;
+                gap: 12px;
+                display: none;
+                box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+                border-top: 1px solid var(--border);
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .nav-links a {
+                width: 100%;
+                padding: 12px;
+                border-radius: 8px;
+                font-size: 0.85rem;
+            }
+
+            .nav-badge {
+                display: none;
+            }
+        }
+
+        /* RIGHT SIDE */
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        /* HAMBURGER */
+        .hamburger {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+
+            background: rgba(255, 82, 0, 0.12);
+
+            border: 1px solid rgba(255, 82, 0, 0.18);
+
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+
+            cursor: pointer;
+
+            transition: all 0.25s ease;
+        }
+
+        .hamburger:hover {
+            background: rgba(255, 82, 0, 0.2);
+        }
+
+        .hamburger span {
+            width: 18px;
+            height: 2px;
+            background: var(--orange);
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+
+        /* ANIMATION */
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(5px, -5px);
+        }
+
+        /* MOBILE */
+        @media (max-width: 768px) {
+
+            nav {
+                padding: 0 16px;
+            }
+
+            .hamburger {
+                display: flex;
+            }
+
+            .nav-badge {
+                display: none;
+            }
+
+            .nav-links {
+
+                position: absolute;
+                top: 70px;
+                left: 16px;
+                right: 16px;
+
+                background: #1f1f1f;
+
+                border: 1px solid rgba(255, 82, 0, 0.18);
+
+                border-radius: 18px;
+
+                padding: 18px;
+
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+
+                box-shadow:
+                    0 12px 30px rgba(0, 0, 0, 0.35);
+
+                opacity: 0;
+                visibility: hidden;
+
+                transform: translateY(-10px);
+
+                transition: all 0.3s ease;
+            }
+
+            .nav-links.active {
+                opacity: 1;
+                visibility: visible;
+                transform: translateY(0);
+            }
+
+            .nav-links a {
+
+                color: rgba(255, 255, 255, 0.75);
+
+                width: 100%;
+
+                padding: 13px 14px;
+
+                border-radius: 12px;
+
+                font-size: 0.82rem;
+
+                font-weight: 700;
+
+                transition: all 0.22s ease;
+            }
+
+            .nav-links a:hover {
+
+                background: rgba(255, 82, 0, 0.14);
+
+                color: var(--orange);
+
+                transform: translateX(4px);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- NAV -->
+    <nav>
+        <a class="nav-brand" href="#">
+            <div class="nav-icon">🍱</div>
+            <span class="nav-name">AharaSetu</span>
+        </a>
+
+        <div class="nav-links" id="navLinks">
+            <a href="#intro">Intro</a>
+            <a href="#problem">Problem</a>
+            <a href="#stack">Stack</a>
+            <a href="#roles">Roles</a>
+            <a href="#features">Features</a>
+            <a href="#timeline">Timeline</a>
+            <a href="#workflow">Workflow</a>
+            <a href="#schema">Schema</a>
+            <a href="#api">API</a>
+            <a href="#testing">Testing</a>
+            <a href="#phase2">Phase 2</a>
+        </div>
+
+        <div class="nav-right">
+            <span class="nav-badge">Phase 1</span>
+
+            <button class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <div class="hero">
+        <div class="hero-grid"></div>
+        <div class="hero-eyebrow">
+            <span class="eyebrow-dot"></span>
+            Phase 1 · Project Report · 2025–26
+        </div>
+        <h1>Ahara<span>Setu</span></h1>
+        <p class="hero-sub-title">Connecting surplus food with people in need</p>
+        <div class="hero-stats">
+            <div class="hero-stat"><span class="stat-val">5</span><span class="stat-lbl">User Roles</span></div>
+            <div class="hero-stat"><span class="stat-val">18+</span><span class="stat-lbl">Features</span></div>
+            <div class="hero-stat"><span class="stat-val">10</span><span class="stat-lbl">Weeks</span></div>
+            <div class="hero-stat"><span class="stat-val">100%</span><span class="stat-lbl">Tests Pass</span></div>
+            <div class="hero-stat"><span class="stat-val">MERN</span><span class="stat-lbl">Stack</span></div>
+        </div>
+        <div class="hero-developer">
+            <div class="dev-avatar"
+                style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#FF5200,#FF8C00);display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:800;color:white;">
+                B</div>
+            <div class="dev-info">
+                <div class="dev-name">Bhanupratap Reddy· Full Stack Developer</div>
+                <div class="dev-role">Ramaiah Institute of Technology · MCA </div>
+            </div>
+        </div>
+    </div>
+
+    <main>
+
+        <!-- INTRO -->
+        <section id="intro">
+            <div class="section-tag reveal">01 · Introduction</div>
+            <h2 class="reveal">What is <em>AharaSetu</em>?</h2>
+            <p class="reveal">AharaSetu — meaning <em>Food Bridge</em> in Sanskrit — is a full-stack MERN web
+                application
+                built to bridge the gap between surplus food at restaurants and people in need, particularly in
+                underserved
+                communities across Indian cities.</p>
+            <p class="reveal">Every day, restaurants discard enormous quantities of perfectly edible food while millions
+                struggle to find a single meal. AharaSetu creates a structured, technology-driven platform connecting
+                food
+                donors with receivers through real payments, admin oversight, and end-to-end transaction tracking.</p>
+
+            <div class="highlight reveal">
+                <p>Built entirely by a single developer — from database design and REST API to React UI, Stripe
+                    payments, email
+                    notifications, and OTP security — as part of the 25MCA26 Full Stack Development course at Ramaiah
+                    Institute of
+                    Technology.</p>
+            </div>
+
+            <div class="card-grid">
+                <div class="card reveal">
+                    <div class="card-icon">🍛</div>
+                    <h4>Free Listings</h4>
+                    <p>Restaurants donate leftover food at no cost to volunteers and NGOs</p>
+                </div>
+                <div class="card reveal">
+                    <div class="card-icon">💰</div>
+                    <h4>Paid Listings</h4>
+                    <p>Restaurants offer surplus food at a significantly reduced price</p>
+                </div>
+                <div class="card reveal">
+                    <div class="card-icon">🛡️</div>
+                    <h4>Admin Oversight</h4>
+                    <p>Every listing reviewed and approved by admin before going live</p>
+                </div>
+                <div class="card reveal">
+                    <div class="card-icon">📧</div>
+                    <h4>Email at Every Step</h4>
+                    <p>Automated HTML email notifications keep all parties informed</p>
+                </div>
+            </div>
+
+            <!-- Developer Card -->
+            <h3 class="reveal">The Developer</h3>
+            <div class="dev-card reveal">
+                <div class="dev-card-avatar">B</div>
+                <div class="dev-card-info">
+                    <h4>Bhanupratap Reddy</h4>
+                    <p>Ramaiah Institute of Technology · Department of MCA</p>
+                    <div class="dev-tags">
+                        <span class="dev-tag">React.js</span>
+                        <span class="dev-tag">Node.js</span>
+                        <span class="dev-tag">Express</span>
+                        <span class="dev-tag">MongoDB</span>
+                        <span class="dev-tag">Stripe</span>
+                        <span class="dev-tag">JWT Auth</span>
+                        <span class="dev-tag">Nodemailer</span>
+                        <span class="dev-tag">REST API</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="divider"></div>
+
+        <!-- PROBLEM -->
+        <section id="problem">
+            <div class="section-tag reveal">02 · Problem Statement</div>
+            <h2 class="reveal">The Problem <em>We Solve</em></h2>
+            <div class="table-wrap reveal">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Problem</th>
+                            <th>Who is Affected</th>
+                            <th>Impact</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Daily food wastage at restaurants</td>
+                            <td>Restaurants, Environment</td>
+                            <td>Tons of edible food discarded daily</td>
+                        </tr>
+                        <tr>
+                            <td>Food insecurity in slum areas</td>
+                            <td>Low-income communities</td>
+                            <td>Malnutrition and hunger</td>
+                        </tr>
+                        <tr>
+                            <td>No centralized digital platform</td>
+                            <td>NGOs and Volunteers</td>
+                            <td>Inefficient food distribution</td>
+                        </tr>
+                        <tr>
+                            <td>Lack of real-time coordination</td>
+                            <td>All stakeholders</td>
+                            <td>Uneven, untracked food sharing</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <h3 class="reveal">Existing Systems & Their Gaps</h3>
+            <div class="table-wrap reveal">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Platform</th>
+                            <th>How it Works</th>
+                            <th>Key Limitation</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Too Good To Go</td>
+                            <td>Sells surplus as "surprise bags"</td>
+                            <td>Paid only, no free option, no transparency</td>
+                        </tr>
+                        <tr>
+                            <td>Olio</td>
+                            <td>Community food sharing app</td>
+                            <td>No admin oversight or payments</td>
+                        </tr>
+                        <tr>
+                            <td>Zomato Feeding India</td>
+                            <td>Restaurant to NGO donations</td>
+                            <td>No volunteer/user involvement</td>
+                        </tr>
+                        <tr>
+                            <td>Swiggy Hope Not Hunger</td>
+                            <td>Surplus food to NGOs</td>
+                            <td>No real-time tracking or payments</td>
+                        </tr>
+                        <tr>
+                            <td>Informal Networks</td>
+                            <td>Staff consume surplus food</td>
+                            <td>No accountability or digital tracking</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <div class="divider"></div>
+
+        <!-- STACK -->
+        <section id="stack">
+            <div class="section-tag reveal">03 · Technology Stack</div>
+            <h2 class="reveal"><em>MERN</em> Architecture</h2>
+            <p class="reveal">Built on the MERN stack with industry-standard tools for authentication, payments, and
+                email.
+            </p>
+            <div class="tech-grid">
+                <div class="tech-card reveal">
+                    <div class="tech-layer">Frontend</div>
+                    <div class="tech-name">React.js</div>
+                    <div class="tech-desc">UI, routing, state management</div>
+                </div>
+                <div class="tech-card reveal">
+                    <div class="tech-layer">Backend</div>
+                    <div class="tech-name">Node.js + Express</div>
+                    <div class="tech-desc">REST API and business logic</div>
+                </div>
+                <div class="tech-card reveal">
+                    <div class="tech-layer">Database</div>
+                    <div class="tech-name">MongoDB + Mongoose</div>
+                    <div class="tech-desc">Data storage and schemas</div>
+                </div>
+                <div class="tech-card reveal">
+                    <div class="tech-layer">Auth</div>
+                    <div class="tech-name">JWT Tokens</div>
+                    <div class="tech-desc">Secure session management</div>
+                </div>
+                <div class="tech-card reveal">
+                    <div class="tech-layer">Payment</div>
+                    <div class="tech-name">Stripe</div>
+                    <div class="tech-desc">Real payments and refunds</div>
+                </div>
+                <div class="tech-card reveal">
+                    <div class="tech-layer">Email</div>
+                    <div class="tech-name">Nodemailer + Gmail</div>
+                    <div class="tech-desc">OTP, receipts, notifications</div>
+                </div>
+                <div class="tech-card reveal">
+                    <div class="tech-layer">Forms</div>
+                    <div class="tech-name">Formspree</div>
+                    <div class="tech-desc">Contact Us and Report Issue</div>
+                </div>
+                <div class="tech-card reveal">
+                    <div class="tech-layer">Version Control</div>
+                    <div class="tech-name">Git + GitHub</div>
+                    <div class="tech-desc">Source code management</div>
+                </div>
+            </div>
+        </section>
+
+        <div class="divider"></div>
+
+        <!-- ROLES -->
+        <section id="roles">
+            <div class="section-tag reveal">04 · User Roles</div>
+            <h2 class="reveal">Role-Based <em>Access System</em></h2>
+            <div class="role-grid">
+                <div class="role-card reveal">
+                    <div class="role-icon">🏪</div>
+                    <div class="role-name">Restaurant</div>
+                    <ul>
+                        <li>Post food listings</li>
+                        <li>Approve/reject claims</li>
+                        <li>Acknowledge provided</li>
+                        <li>View listing IDs</li>
+                        <li>Report issues</li>
+                    </ul>
+                </div>
+                <div class="role-card reveal">
+                    <div class="role-icon">🤝</div>
+                    <div class="role-name">Volunteer</div>
+                    <ul>
+                        <li>Browse listings</li>
+                        <li>Claim food</li>
+                        <li>Make payments</li>
+                        <li>Acknowledge pickup</li>
+                        <li>Rate restaurants</li>
+                    </ul>
+                </div>
+                <div class="role-card reveal">
+                    <div class="role-icon">🏢</div>
+                    <div class="role-name">NGO</div>
+                    <ul>
+                        <li>Browse listings</li>
+                        <li>Claim food</li>
+                        <li>Pay & acknowledge</li>
+                        <li>Rate restaurants</li>
+                    </ul>
+                </div>
+                <div class="role-card reveal">
+                    <div class="role-icon">🛡️</div>
+                    <div class="role-name">Admin</div>
+                    <ul>
+                        <li>Approve/reject listings</li>
+                        <li>Complete transactions</li>
+                        <li>View all data</li>
+                        <li>Manage reports</li>
+                    </ul>
+                </div>
+                <div class="role-card reveal">
+                    <div class="role-icon">👤</div>
+                    <div class="role-name">Regular User</div>
+                    <ul>
+                        <li>Browse listings</li>
+                        <li>Claim free food</li>
+                        <li>Contact admin</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <div class="divider"></div>
+
+        <!-- FEATURES -->
+        <section id="features">
+            <div class="section-tag reveal">05 · Features Implemented</div>
+            <h2 class="reveal">Phase 1 — <em>Complete Feature Set</em></h2>
+
+            <h3 class="reveal">Authentication & Security</h3>
+            <div class="table-wrap reveal">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Feature</th>
+                            <th>Description</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>OTP Registration</td>
+                            <td>6-digit OTP sent to email, expires in 10 minutes, with resend</td>
+                            <td><span class="badge b-done">✓ Done</span></td>
+                        </tr>
+                        <tr>
+                            <td>Email Verification</td>
+                            <td>Users must verify OTP before login is allowed</td>
+                            <td><span class="badge b-done">✓ Done</span></td>
+                        </tr>
+                        <tr>
+                            <td>Auto-verify Admin</td>
+                            <td>Admin accounts auto-verified without OTP requirement</td>
+                            <td><span class="badge b-done">✓ Done</span></td>
+                        </tr>
+                        <tr>
+                            <td>JWT Login</td>
+                            <td>Secure login with JSON Web Token, role embedded in token</td>
+                            <td><span class="badge b-done">✓ Done</span></td>
+                        </tr>
+                        <tr>
+                            <td>Session Management</td>
+                            <td>sessionStorage — clears automatically on browser close</td>
+                            <td><span class="badge b-done">✓ Done</span></td>
+                        </tr>
+                        <tr>
+                            <td>Forgot Password</td>
+                            <td>Reset link sent to email, expires in 15 minutes</td>
+                            <td><span class="badge b-done">✓ Done</span></td>
+                        </tr>
+                        <tr>
+                            <td>Reset Password</td>
+                            <td>Secure token-based reset with live validation hints</td>
+                            <td><span class="badge b-done">✓ Done</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3 class="reveal">Food Listing Management</h3>
+            <div class="table-wrap reveal">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Feature</th>
+                            <th>Description</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Post Food Listing</td>
+                            <td>Title, description, quantity, expiry, type, price, address, phone, email</td>
+                            <td><span class="badge b-done">✓ Done</span></td>
+                        </tr>
+                        <tr>
+                            <td>Dual Mode Listings</td>
+                            <td>Free and Paid listings on the same platform</td>
+                            <td><span class="badge b-done">✓ Done</span></td>
+                        </tr>
+                        <tr>
+                            <td>Admin Approval Workflow</td>
+                            <td>All listings reviewed by admin before going live</td>
+                            <td><span class="badge b-done">✓ Done</span></td>
+                        </tr>
+                        <tr>
+                            <td>Listing ID System</td>
+                            <td>Unique MongoDB ID shown to restaurant and admin for tracking</td>
+                            <td><span class="badge b-done">✓ Done</span></td>
+                        </tr>
+                        <tr>
+                            <td>Auto-refresh</td>
+                            <td>All pages auto-refresh every 5 seconds for real-time updates</td>
+                            <td><span class="badge b-done">✓ Done</span></td>
+                        </tr>
+                        <tr>
+                            <td>Contact Details</td>
+                            <td>Restaurant address, phone, email visible on each listing</td>
+                            <td><span class="badge b-done">✓ Done</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3 class="reveal">Claim & Payment System</h3>
+            <div class="table-wrap reveal">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Feature</th>
+                            <th>Description</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Claim Food</td>
+                            <td>Volunteers/NGOs claim food listings with one click</td>
+                            <td><span class="badge b-done">✓ Done</span></td>
+                        </tr>
+                        <tr>
+                            <td>Stripe Payment</td>
+                            <td>Real Stripe payment integration for paid listings</td>
+                            <td><span class="badge b-done">✓ Done</span></td>
+                        </tr>
+                        <tr>
+                            <td>Payment Receipt Email</td>
+                            <td>Volunteer receives HTML receipt email after payment</td>
+                            <td><span class="badge b-done">✓ Done</span></td>
+                        </tr>
+                        <tr>
+                            <td>Restaurant Notification Email</td>
+                            <td>Restaurant receives full payment details via email</td>
+                            <td><span class="badge b-done">✓ Done</span></td>
+                        </tr>
+                        <tr>
+                            <td>Stripe Refund</td>
+                            <td>Real Stripe refund when restaurant rejects claim</td>
+                            <td><span class="badge b-done">✓ Done</span></td>
+                        </tr>
+                        <tr>
+                            <td>Refund Email</td>
+                            <td>Volunteer receives refund confirmation email</td>
+                            <td><span class="badge b-done">✓ Done</span></td>
+                        </tr>
+                        <tr>
+                            <td>Restaurant Approval</td>
+                            <td>Restaurant can approve or reject each claim</td>
+                            <td><span class="badge b-done">✓ Done</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3 class="reveal">Acknowledgement & Completion</h3>
+            <div class="table-wrap reveal">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Feature</th>
+                            <th>Description</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Restaurant Provides</td>
+                            <td>Restaurant clicks "I Have Provided the Food" button</td>
+                            <td><span class="badge b-done">✓ Done</span></td>
+                        </tr>
+                        <tr>
+                            <td>Volunteer Pickup</td>
+                            <td>Volunteer clicks "I Have Picked Up the Food" button</td>
+                            <td><span class="badge b-done">✓ Done</span></td>
+                        </tr>
+                        <tr>
+                            <td>Dual Acknowledgement</td>
+                            <td>Admin sees both confirmations before completing transaction</td>
+                            <td><span class="badge b-done">✓ Done</span></td>
+                        </tr>
+                        <tr>
+                            <td>Admin Completes</td>
+                            <td>Admin marks transaction complete after both acknowledge</td>
+                            <td><span class="badge b-done">✓ Done</span></td>
+                        </tr>
+                        <tr>
+                            <td>Status Visibility</td>
+                            <td>Each role sees role-specific status messages in real time</td>
+                            <td><span class="badge b-done">✓ Done</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3 class="reveal">Rating System</h3>
+            <div class="table-wrap reveal">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Feature</th>
+                            <th>Description</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Star Rating</td>
+                            <td>Volunteers rate restaurants 1–5 stars after completed transaction</td>
+                            <td><span class="badge b-done">✓ Done</span></td>
+                        </tr>
+                        <tr>
+                            <td>Editable Rating</td>
+                            <td>Volunteers can edit their rating at any time after submission</td>
+                            <td><span class="badge b-done">✓ Done</span></td>
+                        </tr>
+                        <tr>
+                            <td>Skip Rating</td>
+                            <td>Rating is optional — volunteers can skip it</td>
+                            <td><span class="badge b-done">✓ Done</span></td>
+                        </tr>
+                        <tr>
+                            <td>Average on Home Page</td>
+                            <td>Restaurant's cumulative average rating shown on food listings</td>
+                            <td><span class="badge b-done">✓ Done</span></td>
+                        </tr>
+                        <tr>
+                            <td>Per-listing Rating</td>
+                            <td>Individual transaction rating visible on My Listings page</td>
+                            <td><span class="badge b-done">✓ Done</span></td>
+                        </tr>
+                        <tr>
+                            <td>Comment Support</td>
+                            <td>Optional comment up to 300 characters with rating</td>
+                            <td><span class="badge b-done">✓ Done</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3 class="reveal">Notification System</h3>
+            <div class="notif-grid">
+                <div class="notif-item reveal">
+                    <div class="notif-trigger">Restaurant posts food</div>
+                    <div class="notif-recipient">→ All Admins notified</div>
+                </div>
+                <div class="notif-item reveal">
+                    <div class="notif-trigger">Admin approves listing</div>
+                    <div class="notif-recipient">→ Restaurant + All Volunteers/NGOs</div>
+                </div>
+                <div class="notif-item reveal">
+                    <div class="notif-trigger">Admin rejects listing</div>
+                    <div class="notif-recipient">→ Restaurant notified</div>
+                </div>
+                <div class="notif-item reveal">
+                    <div class="notif-trigger">Volunteer claims food</div>
+                    <div class="notif-recipient">→ Restaurant notified</div>
+                </div>
+                <div class="notif-item reveal">
+                    <div class="notif-trigger">Restaurant approves claim</div>
+                    <div class="notif-recipient">→ Volunteer/NGO notified</div>
+                </div>
+                <div class="notif-item reveal">
+                    <div class="notif-trigger">Restaurant rejects claim</div>
+                    <div class="notif-recipient">→ Volunteer/NGO notified</div>
+                </div>
+                <div class="notif-item reveal">
+                    <div class="notif-trigger">Both parties acknowledge</div>
+                    <div class="notif-recipient">→ All Admins notified</div>
+                </div>
+                <div class="notif-item reveal">
+                    <div class="notif-trigger">Admin completes transaction</div>
+                    <div class="notif-recipient">→ Restaurant + Volunteer/NGO</div>
+                </div>
+            </div>
+
+            <h3 class="reveal">Admin Panel</h3>
+            <div class="table-wrap reveal">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Feature</th>
+                            <th>Description</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Dashboard Stats</td>
+                            <td>Total, pending, action needed, completed count widgets</td>
+                            <td><span class="badge b-done">✓ Done</span></td>
+                        </tr>
+                        <tr>
+                            <td>Filter Tabs</td>
+                            <td>All / Pending / Approved / Action Needed / Completed / Rejected</td>
+                            <td><span class="badge b-done">✓ Done</span></td>
+                        </tr>
+                        <tr>
+                            <td>Listing ID Display</td>
+                            <td>Unique MongoDB ID shown on every listing card</td>
+                            <td><span class="badge b-done">✓ Done</span></td>
+                        </tr>
+                        <tr>
+                            <td>Approve/Reject Listings</td>
+                            <td>Admin can approve or reject any submitted listing</td>
+                            <td><span class="badge b-done">✓ Done</span></td>
+                        </tr>
+                        <tr>
+                            <td>Complete Transactions</td>
+                            <td>Mark complete after both parties acknowledge</td>
+                            <td><span class="badge b-done">✓ Done</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3 class="reveal">Contact & Support</h3>
+            <div class="table-wrap reveal">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Feature</th>
+                            <th>Description</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Contact Us Page</td>
+                            <td>Formspree-powered form for all users to message admin</td>
+                            <td><span class="badge b-done">✓ Done</span></td>
+                        </tr>
+                        <tr>
+                            <td>Report Issue</td>
+                            <td>Volunteers and restaurants report listing-specific problems</td>
+                            <td><span class="badge b-done">✓ Done</span></td>
+                        </tr>
+                        <tr>
+                            <td>Pre-filled Listing ID</td>
+                            <td>Report form auto-fills listing ID and title from listing card</td>
+                            <td><span class="badge b-done">✓ Done</span></td>
+                        </tr>
+                        <tr>
+                            <td>Issue Categories</td>
+                            <td>Structured predefined issue types for organized admin tracking</td>
+                            <td><span class="badge b-done">✓ Done</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <div class="divider"></div>
+
+        <!-- TIMELINE -->
+        <section id="timeline">
+            <div class="section-tag reveal">06 · Development Timeline</div>
+            <h2 class="reveal">10-Week <em>Build Journey</em></h2>
+            <div class="timeline">
+                <div class="tl-item reveal">
+                    <div class="tl-week">Week 01</div>
+                    <div class="tl-content">Project setup, MERN stack installation, folder structure, MongoDB
+                        connection, Express
+                        server setup</div>
+                </div>
+                <div class="tl-item reveal">
+                    <div class="tl-week">Week 02</div>
+                    <div class="tl-content">User authentication — Register, Login, JWT tokens, role-based access, auth
+                        middleware
+                    </div>
+                </div>
+                <div class="tl-item reveal">
+                    <div class="tl-week">Week 03</div>
+                    <div class="tl-content">Food listing CRUD — Create, Read, Claim routes, MongoDB models for User and
+                        FoodListing</div>
+                </div>
+                <div class="tl-item reveal">
+                    <div class="tl-week">Week 04</div>
+                    <div class="tl-content">Admin panel — Approve/reject listings, role-based dashboard, frontend pages
+                        for all
+                        roles</div>
+                </div>
+                <div class="tl-item reveal">
+                    <div class="tl-week">Week 05</div>
+                    <div class="tl-content">Payment integration — Stripe payment intent, card processing, real refunds
+                        on
+                        rejection</div>
+                </div>
+                <div class="tl-item reveal">
+                    <div class="tl-week">Week 06</div>
+                    <div class="tl-content">Email system — Payment receipts, refund notifications, restaurant alerts via
+                        Gmail
+                        SMTP</div>
+                </div>
+                <div class="tl-item reveal">
+                    <div class="tl-week">Week 07</div>
+                    <div class="tl-content">Acknowledgement system — Restaurant provided, volunteer pickup, admin
+                        completion
+                        workflow</div>
+                </div>
+                <div class="tl-item reveal">
+                    <div class="tl-week">Week 08</div>
+                    <div class="tl-content">OTP verification — 6-digit OTP on registration, resend, countdown timer,
+                        forgot/reset
+                        password</div>
+                </div>
+                <div class="tl-item reveal">
+                    <div class="tl-week">Week 09</div>
+                    <div class="tl-content">Notification system — Bell icon, real-time unread count, dropdown, mark
+                        read, delete
+                        all</div>
+                </div>
+                <div class="tl-item reveal">
+                    <div class="tl-week">Week 10</div>
+                    <div class="tl-content">Rating system, Contact Us, Report Issue, UI/UX redesign, session management,
+                        final
+                        testing</div>
+                </div>
+            </div>
+        </section>
+
+        <div class="divider"></div>
+
+        <!-- WORKFLOW -->
+        <section id="workflow">
+            <div class="section-tag reveal">07 · Application Workflow</div>
+            <h2 class="reveal">How It <em>All Works</em></h2>
+
+            <h3 class="reveal">Food Listing Flow</h3>
+            <div class="flow-steps">
+                <div class="flow-step reveal">
+                    <div class="flow-num">1</div>
+                    <div class="flow-text">Restaurant registers and verifies OTP to activate their account</div>
+                </div>
+                <div class="flow-step reveal">
+                    <div class="flow-num">2</div>
+                    <div class="flow-text">Restaurant posts food listing with title, quantity, address, phone, type and
+                        price
+                    </div>
+                </div>
+                <div class="flow-step reveal">
+                    <div class="flow-num">3</div>
+                    <div class="flow-text">Admin receives bell notification and reviews the listing</div>
+                </div>
+                <div class="flow-step reveal">
+                    <div class="flow-num">4</div>
+                    <div class="flow-text">Admin approves → All volunteers/NGOs notified of new food available</div>
+                </div>
+                <div class="flow-step reveal">
+                    <div class="flow-num">5</div>
+                    <div class="flow-text">Listing goes live on Home page for all users to browse</div>
+                </div>
+            </div>
+
+            <h3 class="reveal">Claim & Payment Flow</h3>
+            <div class="flow-steps">
+                <div class="flow-step reveal">
+                    <div class="flow-num">1</div>
+                    <div class="flow-text">Volunteer sees listing on Home page and clicks Claim</div>
+                </div>
+                <div class="flow-step reveal">
+                    <div class="flow-num">2</div>
+                    <div class="flow-text">If FREE → goes directly to pending restaurant approval</div>
+                </div>
+                <div class="flow-step reveal">
+                    <div class="flow-num">3</div>
+                    <div class="flow-text">If PAID → redirected to Stripe payment page with order summary</div>
+                </div>
+                <div class="flow-step reveal">
+                    <div class="flow-num">4</div>
+                    <div class="flow-text">Volunteer enters card details → real Stripe payment processed</div>
+                </div>
+                <div class="flow-step reveal">
+                    <div class="flow-num">5</div>
+                    <div class="flow-text">HTML receipt email to volunteer; payment notification email to restaurant
+                    </div>
+                </div>
+                <div class="flow-step reveal">
+                    <div class="flow-num">6</div>
+                    <div class="flow-text">Restaurant approves or rejects the claim from My Listings page</div>
+                </div>
+                <div class="flow-step reveal">
+                    <div class="flow-num">7</div>
+                    <div class="flow-text">If REJECTED → real Stripe refund issued + refund email sent to volunteer
+                    </div>
+                </div>
+            </div>
+
+            <h3 class="reveal">Acknowledgement & Completion Flow</h3>
+            <div class="flow-steps">
+                <div class="flow-step reveal">
+                    <div class="flow-num">1</div>
+                    <div class="flow-text">Restaurant clicks "I Have Provided the Food" on My Listings page</div>
+                </div>
+                <div class="flow-step reveal">
+                    <div class="flow-num">2</div>
+                    <div class="flow-text">Volunteer clicks "I Have Picked Up the Food" on My Claims page</div>
+                </div>
+                <div class="flow-step reveal">
+                    <div class="flow-num">3</div>
+                    <div class="flow-text">Admin receives notification: both parties have acknowledged</div>
+                </div>
+                <div class="flow-step reveal">
+                    <div class="flow-num">4</div>
+                    <div class="flow-text">Admin clicks "Mark Transaction as Completed" on Admin Panel</div>
+                </div>
+                <div class="flow-step reveal">
+                    <div class="flow-num">5</div>
+                    <div class="flow-text">Volunteer can now rate the restaurant from My Claims page</div>
+                </div>
+            </div>
+        </section>
+
+        <div class="divider"></div>
+
+        <!-- SCHEMA -->
+        <section id="schema">
+            <div class="section-tag reveal">08 · Database Schema</div>
+            <h2 class="reveal">MongoDB <em>Data Models</em></h2>
+            <div class="schema-grid">
+                <div class="schema-card reveal">
+                    <div class="schema-head">👤 User Schema</div>
+                    <div class="schema-field"><span class="sf-name">name</span><span class="sf-type">String</span></div>
+                    <div class="schema-field"><span class="sf-name">email</span><span class="sf-type">String ·
+                            unique</span></div>
+                    <div class="schema-field"><span class="sf-name">password</span><span class="sf-type">String ·
+                            bcrypt</span>
+                    </div>
+                    <div class="schema-field"><span class="sf-name">role</span><span class="sf-type">Enum · 5
+                            values</span></div>
+                    <div class="schema-field"><span class="sf-name">isVerified</span><span
+                            class="sf-type">Boolean</span></div>
+                    <div class="schema-field"><span class="sf-name">otp</span><span class="sf-type">String</span></div>
+                    <div class="schema-field"><span class="sf-name">otpExpire</span><span class="sf-type">Date ·
+                            10min</span>
+                    </div>
+                    <div class="schema-field"><span class="sf-name">resetPasswordToken</span><span
+                            class="sf-type">String ·
+                            hashed</span></div>
+                    <div class="schema-field"><span class="sf-name">resetPasswordExpire</span><span class="sf-type">Date
+                            ·
+                            15min</span></div>
+                </div>
+                <div class="schema-card reveal">
+                    <div class="schema-head">🍱 FoodListing Schema</div>
+                    <div class="schema-field"><span class="sf-name">title, description, quantity</span><span
+                            class="sf-type">String</span></div>
+                    <div class="schema-field"><span class="sf-name">expiryTime</span><span class="sf-type">Date</span>
+                    </div>
+                    <div class="schema-field"><span class="sf-name">type</span><span class="sf-type">Enum: free |
+                            paid</span>
+                    </div>
+                    <div class="schema-field"><span class="sf-name">price</span><span class="sf-type">Number ·
+                            INR</span></div>
+                    <div class="schema-field"><span class="sf-name">address, phone, contactEmail</span><span
+                            class="sf-type">String</span></div>
+                    <div class="schema-field"><span class="sf-name">adminApproved, adminRejected</span><span
+                            class="sf-type">Boolean</span></div>
+                    <div class="schema-field"><span class="sf-name">status</span><span class="sf-type">Enum · 6
+                            states</span>
+                    </div>
+                    <div class="schema-field"><span class="sf-name">paymentDone, paymentId</span><span
+                            class="sf-type">Mixed</span></div>
+                    <div class="schema-field"><span class="sf-name">restaurantProvided, volunteerPickedUp,
+                            adminCompleted</span><span class="sf-type">Boolean</span></div>
+                    <div class="schema-field"><span class="sf-name">postedBy, claimedBy</span><span
+                            class="sf-type">ObjectId
+                            ref</span></div>
+                </div>
+                <div class="schema-card reveal">
+                    <div class="schema-head">⭐ Rating Schema</div>
+                    <div class="schema-field"><span class="sf-name">foodListing</span><span class="sf-type">ObjectId →
+                            FoodListing</span></div>
+                    <div class="schema-field"><span class="sf-name">restaurant</span><span class="sf-type">ObjectId →
+                            User</span>
+                    </div>
+                    <div class="schema-field"><span class="sf-name">volunteer</span><span class="sf-type">ObjectId →
+                            User</span>
+                    </div>
+                    <div class="schema-field"><span class="sf-name">stars</span><span class="sf-type">Number ·
+                            1–5</span></div>
+                    <div class="schema-field"><span class="sf-name">comment</span><span class="sf-type">String · max
+                            300</span>
+                    </div>
+                    <div class="schema-field"><span class="sf-name">createdAt</span><span class="sf-type">Date ·
+                            auto</span></div>
+                </div>
+                <div class="schema-card reveal">
+                    <div class="schema-head">🔔 Notification Schema</div>
+                    <div class="schema-field"><span class="sf-name">recipient</span><span class="sf-type">ObjectId →
+                            User</span>
+                    </div>
+                    <div class="schema-field"><span class="sf-name">message</span><span class="sf-type">String</span>
+                    </div>
+                    <div class="schema-field"><span class="sf-name">type</span><span class="sf-type">Enum · 9
+                            types</span></div>
+                    <div class="schema-field"><span class="sf-name">listingId</span><span class="sf-type">ObjectId →
+                            FoodListing</span></div>
+                    <div class="schema-field"><span class="sf-name">isRead</span><span class="sf-type">Boolean</span>
+                    </div>
+                    <div class="schema-field"><span class="sf-name">createdAt</span><span class="sf-type">Date ·
+                            auto</span></div>
+                </div>
+            </div>
+        </section>
+
+        <div class="divider"></div>
+
+        <!-- API -->
+        <section id="api">
+            <div class="section-tag reveal">09 · API Reference</div>
+            <h2 class="reveal">REST <em>API Endpoints</em></h2>
+
+            <h3 class="reveal">Auth Routes — /api/auth</h3>
+            <div class="reveal">
+                <div class="endpoint"><span class="method post">POST</span><span class="ep-path">/register</span><span
+                        class="ep-desc">Register user and send OTP</span></div>
+                <div class="endpoint"><span class="method post">POST</span><span class="ep-path">/verify-otp</span><span
+                        class="ep-desc">Verify OTP to activate account</span></div>
+                <div class="endpoint"><span class="method post">POST</span><span class="ep-path">/resend-otp</span><span
+                        class="ep-desc">Resend OTP to email</span></div>
+                <div class="endpoint"><span class="method post">POST</span><span class="ep-path">/login</span><span
+                        class="ep-desc">Login and receive JWT token</span></div>
+                <div class="endpoint"><span class="method post">POST</span><span
+                        class="ep-path">/forgot-password</span><span class="ep-desc">Send password reset email</span>
+                </div>
+                <div class="endpoint"><span class="method post">POST</span><span
+                        class="ep-path">/reset-password/:token</span><span class="ep-desc">Reset password with
+                        token</span></div>
+            </div>
+
+            <h3 class="reveal">Food Routes — /api/food</h3>
+            <div class="reveal">
+                <div class="endpoint"><span class="method get">GET</span><span class="ep-path">/</span><span
+                        class="access a-pub">Public</span><span class="ep-desc">Get all approved listings</span></div>
+                <div class="endpoint"><span class="method post">POST</span><span class="ep-path">/</span><span
+                        class="access a-res">Restaurant</span><span class="ep-desc">Create food listing</span></div>
+                <div class="endpoint"><span class="method get">GET</span><span class="ep-path">/my-listings</span><span
+                        class="access a-res">Restaurant</span><span class="ep-desc">Get own listings</span></div>
+                <div class="endpoint"><span class="method put">PUT</span><span
+                        class="ep-path">/approve-claim/:id</span><span class="access a-res">Restaurant</span><span
+                        class="ep-desc">Approve volunteer claim</span></div>
+                <div class="endpoint"><span class="method put">PUT</span><span
+                        class="ep-path">/reject-claim/:id</span><span class="access a-res">Restaurant</span><span
+                        class="ep-desc">Reject claim and refund</span></div>
+                <div class="endpoint"><span class="method put">PUT</span><span
+                        class="ep-path">/restaurant-provided/:id</span><span class="access a-res">Restaurant</span><span
+                        class="ep-desc">Acknowledge food provided</span></div>
+                <div class="endpoint"><span class="method put">PUT</span><span class="ep-path">/claim/:id</span><span
+                        class="access a-vol">Volunteer</span><span class="ep-desc">Claim a listing</span></div>
+                <div class="endpoint"><span class="method put">PUT</span><span class="ep-path">/pay/:id</span><span
+                        class="access a-vol">Volunteer</span><span class="ep-desc">Confirm Stripe payment</span></div>
+                <div class="endpoint"><span class="method get">GET</span><span class="ep-path">/my-claims</span><span
+                        class="access a-vol">Volunteer</span><span class="ep-desc">Get claimed listings</span></div>
+                <div class="endpoint"><span class="method put">PUT</span><span
+                        class="ep-path">/volunteer-pickedup/:id</span><span class="access a-vol">Volunteer</span><span
+                        class="ep-desc">Acknowledge pickup</span></div>
+                <div class="endpoint"><span class="method get">GET</span><span class="ep-path">/admin/all</span><span
+                        class="access a-adm">Admin</span><span class="ep-desc">Get all listings</span></div>
+                <div class="endpoint"><span class="method put">PUT</span><span
+                        class="ep-path">/admin/approve/:id</span><span class="access a-adm">Admin</span><span
+                        class="ep-desc">Approve listing</span></div>
+                <div class="endpoint"><span class="method put">PUT</span><span
+                        class="ep-path">/admin/reject/:id</span><span class="access a-adm">Admin</span><span
+                        class="ep-desc">Reject listing</span></div>
+                <div class="endpoint"><span class="method put">PUT</span><span
+                        class="ep-path">/admin/complete/:id</span><span class="access a-adm">Admin</span><span
+                        class="ep-desc">Complete transaction</span></div>
+            </div>
+
+            <h3 class="reveal">Rating Routes — /api/ratings</h3>
+            <div class="reveal">
+                <div class="endpoint"><span class="method post">POST</span><span
+                        class="ep-path">/listing/:listingId</span><span class="access a-vol">Volunteer</span><span
+                        class="ep-desc">Submit or update rating</span></div>
+                <div class="endpoint"><span class="method get">GET</span><span
+                        class="ep-path">/my-rating/:listingId</span><span class="access a-vol">Volunteer</span><span
+                        class="ep-desc">Get my rating for a transaction</span></div>
+                <div class="endpoint"><span class="method get">GET</span><span
+                        class="ep-path">/restaurant/:restaurantId</span><span
+                        class="access a-res">Restaurant</span><span class="ep-desc">Get all ratings for
+                        restaurant</span></div>
+                <div class="endpoint"><span class="method get">GET</span><span
+                        class="ep-path">/average/:restaurantId</span><span class="access a-pub">Public</span><span
+                        class="ep-desc">Get average rating for home page</span></div>
+            </div>
+
+            <h3 class="reveal">Notification Routes — /api/notifications</h3>
+            <div class="reveal">
+                <div class="endpoint"><span class="method get">GET</span><span class="ep-path">/</span><span
+                        class="ep-desc">Get
+                        user notifications (last 20)</span></div>
+                <div class="endpoint"><span class="method get">GET</span><span class="ep-path">/unread-count</span><span
+                        class="ep-desc">Get unread count for bell badge</span></div>
+                <div class="endpoint"><span class="method put">PUT</span><span
+                        class="ep-path">/mark-all-read</span><span class="ep-desc">Mark all notifications as read</span>
+                </div>
+                <div class="endpoint"><span class="method put">PUT</span><span
+                        class="ep-path">/mark-read/:id</span><span class="ep-desc">Mark single notification read</span>
+                </div>
+                <div class="endpoint"><span class="method del">DEL</span><span class="ep-path">/delete-all</span><span
+                        class="ep-desc">Delete all notifications</span></div>
+            </div>
+        </section>
+
+        <div class="divider"></div>
+
+        <!-- TESTING -->
+        <section id="testing">
+            <div class="section-tag reveal">10 · Testing</div>
+            <h2 class="reveal">All <em>20 Tests</em> Passing</h2>
+            <div class="test-grid">
+                <div class="test-item reveal"><span class="test-pass">PASS</span>Register with new email → OTP sent to
+                    inbox
+                </div>
+                <div class="test-item reveal"><span class="test-pass">PASS</span>Wrong OTP entered → error message shown
+                </div>
+                <div class="test-item reveal"><span class="test-pass">PASS</span>OTP expires after 10 min → resend
+                    option
+                    appears</div>
+                <div class="test-item reveal"><span class="test-pass">PASS</span>Login without OTP verification →
+                    redirect to
+                    OTP page</div>
+                <div class="test-item reveal"><span class="test-pass">PASS</span>Login with correct credentials → JWT
+                    issued
+                </div>
+                <div class="test-item reveal"><span class="test-pass">PASS</span>Post food as restaurant → listing
+                    saved, admin
+                    notified</div>
+                <div class="test-item reveal"><span class="test-pass">PASS</span>Admin approves listing → listing goes
+                    live, all
+                    notified</div>
+                <div class="test-item reveal"><span class="test-pass">PASS</span>Admin rejects listing → restaurant
+                    receives
+                    notification</div>
+                <div class="test-item reveal"><span class="test-pass">PASS</span>Volunteer claims paid food → Stripe
+                    payment
+                    page shown</div>
+                <div class="test-item reveal"><span class="test-pass">PASS</span>Stripe test card payment → processed,
+                    emails
+                    sent to both</div>
+                <div class="test-item reveal"><span class="test-pass">PASS</span>Restaurant rejects claim → real Stripe
+                    refund +
+                    email</div>
+                <div class="test-item reveal"><span class="test-pass">PASS</span>Both parties acknowledge → admin
+                    notified to
+                    complete</div>
+                <div class="test-item reveal"><span class="test-pass">PASS</span>Admin completes transaction → status
+                    updated
+                    for all</div>
+                <div class="test-item reveal"><span class="test-pass">PASS</span>Volunteer rates restaurant → 1–5 stars
+                    with
+                    comment</div>
+                <div class="test-item reveal"><span class="test-pass">PASS</span>Rating editable → update stars and
+                    comment
+                    anytime</div>
+                <div class="test-item reveal"><span class="test-pass">PASS</span>Average rating shown on home page
+                    listings
+                </div>
+                <div class="test-item reveal"><span class="test-pass">PASS</span>Forgot password → reset email with
+                    15-min
+                    expiry link</div>
+                <div class="test-item reveal"><span class="test-pass">PASS</span>Report issue with listing ID →
+                    submitted via
+                    Formspree</div>
+                <div class="test-item reveal"><span class="test-pass">PASS</span>Notification bell → unread badge count,
+                    dropdown works</div>
+                <div class="test-item reveal"><span class="test-pass">PASS</span>Browser close → session cleared, fresh
+                    login
+                    required</div>
+            </div>
+        </section>
+
+        <div class="divider"></div>
+
+        <!-- PHASE 2 -->
+        <section id="phase2">
+            <div class="section-tag reveal">11 · Phase 2 Roadmap</div>
+            <h2 class="reveal">What's <em>Coming Next</em></h2>
+            <div class="p2-grid">
+                <div class="p2-card reveal"><span class="p2-priority b-high">High</span>
+                    <div class="p2-icon">🎨</div>
+                    <h4>UI/UX Enhancement</h4>
+                    <p>Complete redesign with orange/black/white theme — warm, friendly, Zomato-inspired interface.</p>
+                </div>
+                <div class="p2-card reveal"><span class="p2-priority b-high">High</span>
+                    <div class="p2-icon">🌐</div>
+                    <h4>Online Hosting</h4>
+                    <p>Deploy backend on Render, frontend on Vercel, database on MongoDB Atlas for public access.</p>
+                </div>
+                <div class="p2-card reveal"><span class="p2-priority b-med">Med</span>
+                    <div class="p2-icon">💳</div>
+                    <h4>Subscription Plans</h4>
+                    <p>Free plan (3 listings/month) vs Premium (unlimited). Stripe subscription billing integration.</p>
+                </div>
+                <div class="p2-card reveal"><span class="p2-priority b-med">Med</span>
+                    <div class="p2-icon">📱</div>
+                    <h4>Push Notifications</h4>
+                    <p>Browser push notifications alongside the existing in-app bell icon system.</p>
+                </div>
+                <div class="p2-card reveal"><span class="p2-priority b-med">Med</span>
+                    <div class="p2-icon">📊</div>
+                    <h4>Analytics Dashboard</h4>
+                    <p>Admin charts: meals saved, active restaurants, transaction trends, top donors.</p>
+                </div>
+                <div class="p2-card reveal"><span class="p2-priority b-low">Low</span>
+                    <div class="p2-icon">🗺️</div>
+                    <h4>Map View</h4>
+                    <p>Google Maps showing nearby food listings with distance and directions.</p>
+                </div>
+                <div class="p2-card reveal"><span class="p2-priority b-low">Low</span>
+                    <div class="p2-icon">🌏</div>
+                    <h4>Multi-language</h4>
+                    <p>Kannada, Hindi, Tamil support for wider reach across Indian cities.</p>
+                </div>
+                <div class="p2-card reveal"><span class="p2-priority b-low">Low</span>
+                    <div class="p2-icon">🔄</div>
+                    <h4>Recurring Listings</h4>
+                    <p>Restaurants set up recurring daily listings automatically without re-posting.</p>
+                </div>
+            </div>
+        </section>
+
+        <div class="divider"></div>
+
+        <!-- CONCLUSION -->
+        <section>
+            <div class="section-tag reveal">12 · Conclusion</div>
+            <h2 class="reveal">Phase 1 — <em>Mission Accomplished</em></h2>
+            <p class="reveal">Phase 1 of AharaSetu has been successfully completed as a solo full-stack development
+                project,
+                covering everything from database schema design and REST API architecture to React UI, Stripe payment
+                integration, email automation, OTP security, real-time notifications, and a rating system.</p>
+            <div class="highlight reveal">
+                <p>AharaSetu is the only platform offering dual-mode listings (free + paid), end-to-end three-party
+                    acknowledgement, real Stripe payments with automatic refunds, admin-gated approvals, and a
+                    transparent rating
+                    system — all built by a single developer as part of the MCA Full Stack Development course.</p>
+            </div>
+            <div class="card-grid">
+                <div class="card reveal">
+                    <div class="card-icon">🔄</div>
+                    <h4>Dual-Mode Platform</h4>
+                    <p>Free and paid listings on one unified system — no competitor offers both</p>
+                </div>
+                <div class="card reveal">
+                    <div class="card-icon">📋</div>
+                    <h4>Full Lifecycle Tracking</h4>
+                    <p>Three-party acknowledgement ensures every transaction is verified</p>
+                </div>
+                <div class="card reveal">
+                    <div class="card-icon">💳</div>
+                    <h4>Real Payments</h4>
+                    <p>Stripe integration with actual card processing and automatic refunds</p>
+                </div>
+                <div class="card reveal">
+                    <div class="card-icon">⭐</div>
+                    <h4>Rating System</h4>
+                    <p>Transparent restaurant ratings help volunteers make informed decisions</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        <div class="footer-brand">
+            <div class="footer-icon">🍱</div>
+            <span class="footer-name">AharaSetu</span>
+        </div>
+        <p>Phase 1 Project Report · Ramaiah Institute of Technology · MCA Department · 2025–26</p>
+        <p>Developed by Bhanupratap Reddy</p>
+        <div class="footer-tags">
+            <span class="footer-tag">React.js</span>
+            <span class="footer-tag">Node.js</span>
+            <span class="footer-tag">Express</span>
+            <span class="footer-tag">MongoDB</span>
+            <span class="footer-tag">Stripe</span>
+            <span class="footer-tag">JWT</span>
+            <span class="footer-tag">Nodemailer</span>
+            <span class="footer-tag">Formspree</span>
+        </div>
+    </footer>
+
+    <script>
+        // SCROLL REVEAL
+        const reveals = document.querySelectorAll('.reveal');
+        const obs = new IntersectionObserver(entries => {
+            entries.forEach(e => {
+                if (e.isIntersecting) { e.target.classList.add('in'); obs.unobserve(e.target); }
+            });
+        }, { threshold: 0.06, rootMargin: '0px 0px -24px 0px' });
+        reveals.forEach(el => obs.observe(el));
+
+        // ACTIVE NAV
+        const sections = document.querySelectorAll('section[id]');
+        const navLinks = document.querySelectorAll('.nav-links a');
+        window.addEventListener('scroll', () => {
+            let cur = '';
+            sections.forEach(s => { if (window.scrollY >= s.offsetTop - 80) cur = s.id; });
+            navLinks.forEach(a => {
+                const active = a.getAttribute('href') === '#' + cur;
+                a.style.color = active ? 'var(--orange)' : '';
+                a.style.background = active ? 'var(--orange-light)' : '';
+            });
+        });
+
+        // TABLE ROW ACCENT
+        document.querySelectorAll('tbody tr').forEach(r => {
+            r.addEventListener('mouseenter', () => r.style.boxShadow = 'inset 3px 0 0 var(--orange)');
+            r.addEventListener('mouseleave', () => r.style.boxShadow = '');
+        });
+    </script>
+    <script>
+        const hamburger = document.getElementById("hamburger");
+        const MobileNavLinks = document.getElementById("navLinks");
+        const navItems = document.querySelectorAll(".nav-links a");
+
+        // Toggle menu
+        hamburger.addEventListener("click", () => {
+            MobileNavLinks.classList.toggle("active");
+            hamburger.classList.toggle("active");
+        });
+
+        // Close menu after clicking nav item
+        navItems.forEach(item => {
+            item.addEventListener("click", () => {
+                MobileNavLinks.classList.remove("active");
+                hamburger.classList.remove("active");
+            });
+        });
+    </script>
+</body>
+
+</html>

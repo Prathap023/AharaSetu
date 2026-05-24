@@ -18,7 +18,7 @@ function RatingModal({ listing, onClose, onSaved }) {
   const fetchExisting = async () => {
     try {
       const res = await axios.get(
-        `http://localhost:5000/api/ratings/my-rating/${listing._id}`,
+        `https://aharasetu-backend-pov2.onrender.com/api/ratings/my-rating/${listing._id}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       if (res.data) {
@@ -39,7 +39,7 @@ function RatingModal({ listing, onClose, onSaved }) {
     setLoading(true);
     try {
       await axios.post(
-        `http://localhost:5000/api/ratings/listing/${listing._id}`,
+        `https://aharasetu-backend-pov2.onrender.com/api/ratings/listing/${listing._id}`,
         { stars, comment },
         { headers: { Authorization: `Bearer ${token}` } }
       );
