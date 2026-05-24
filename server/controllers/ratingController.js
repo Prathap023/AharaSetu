@@ -16,16 +16,19 @@ exports.submitRating = async (req, res) => {
 
     // Upsert — create or update
     const rating = await Rating.findOneAndUpdate(
-      { foodListing: listingId, volunteer: req.user.id },
-      {
-        stars,
-        comment,
-        restaurant: food.postedBy,
-        foodListing: listingId,
-        volunteer: req.user.id,
-      },
-      { upsert: true, new: true }
-    );
+  { foodListing: listingId, volunteer: req.user.id },
+  {
+    stars,
+    comment,
+    restaurant: food.postedBy,
+    foodListing: listingId,
+    volunteer: req.user.id,
+  },
+  {
+    upsert: true,
+    returnDocument: 'after',
+  }
+);
 
     res.json({ message: 'Rating saved!', rating });
   } catch (err) {
