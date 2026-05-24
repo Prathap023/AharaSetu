@@ -47,6 +47,7 @@ function Navbar() {
                       ...styles.navLink,
                       ...(isActive('/my-listings') ? styles.navLinkActive : {})
                     }}>My Listings</Link>
+                    
                     <Link to="/contact" style={{
                       ...styles.navLink,
                       ...(isActive('/contact') ? styles.navLinkActive : {})
@@ -85,6 +86,17 @@ function Navbar() {
               <>
                 <Link to="/" style={styles.navLink}>Browse Food</Link>
                 <Link to="/contact" style={styles.navLink}>Contact</Link>
+                <a
+                      href="https://aharasetu-report.onrender.com/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        ...styles.navLink,
+                        ...(isActive('/about') ? styles.navLinkActive : {})
+                      }}
+                    >
+                      What We have done
+                    </a>
               </>
             )}
           </div>
@@ -162,7 +174,6 @@ function Navbar() {
             <>
               <Link to="/" style={styles.mobileLink} onClick={() => setMenuOpen(false)}>🍱 Browse Food</Link>
               <Link to="/contact" style={styles.mobileLink} onClick={() => setMenuOpen(false)}>📬 Contact</Link>
-              <Link to="https://aharasetu-report.onrender.com/" target="_blank" rel="noopener noreferrer" style={styles.mobileLink} onClick={() => setMenuOpen(false)}>What We have done</Link>
               <Link to="/login" style={styles.mobileLink} onClick={() => setMenuOpen(false)}>Login</Link>
               <Link to="/register" style={styles.mobileRegister} onClick={() => setMenuOpen(false)}>Sign Up</Link>
             </>
