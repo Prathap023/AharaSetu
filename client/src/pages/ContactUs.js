@@ -13,196 +13,132 @@ function ContactUs() {
   const [status, setStatus] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    setStatus('');
-
+    setLoading(true); setStatus('');
     try {
-      const response = await fetch('https://formspree.io/f/mvzdnkzw', {
+      const res = await fetch('https://formspree.io/f/mvzdnkzw', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: form.name,
-          email: form.email,
-          role: form.role,
-          subject: form.subject,
-          message: form.message,
-        }),
+        body: JSON.stringify(form),
       });
-
-      if (response.ok) {
-        setStatus('success');
-        setForm({
-          name: user?.name || '',
-          email: '',
-          role: user?.role || '',
-          subject: '',
-          message: '',
-        });
-      } else {
-        setStatus('error');
-      }
-    } catch (err) {
-      setStatus('error');
-    }
+      setStatus(res.ok ? 'success' : 'error');
+      if (res.ok) setForm({ name: user?.name || '', email: '', role: user?.role || '', subject: '', message: '' });
+    } catch { setStatus('error'); }
     setLoading(false);
   };
 
-  return (
-    <div style={styles.container}>
-      <div style={styles.left}>
-        <h2 style={styles.leftTitle}>📬 Get in Touch</h2>
-        <p style={styles.leftSubtitle}>
-          Have a question, complaint or suggestion? We're here to help!
-        </p>
+  const subjects = [
+    { value: '', label: 'Select a subject' },
+    { value: 'Listing Issue', label: '🍱 Listing Issue' },
+    { value: 'Payment Issue', label: '💳 Payment Issue' },
+    { value: 'Refund Request', label: '💸 Refund Request' },
+    { value: 'Claim Issue', label: '📦 Claim Issue' },
+    { value: 'Account Issue', label: '👤 Account Issue' },
+    { value: 'Feedback', label: '💬 Feedback' },
+    { value: 'Other', label: '❓ Other' },
+  ];
 
-        <div style={styles.infoBox}>
-          <div style={styles.infoItem}>
-            <span style={styles.infoIcon}>📧</span>
-            <div>
-              <p style={styles.infoLabel}>Email Us</p>
-              <p style={styles.infoValue}>admin@aharasetu.com <del>this mail not working as of now</del></p>
-            </div>
-          </div>
-          <div style={styles.infoItem}>
-            <span style={styles.infoIcon}>⏰</span>
-            <div>
-              <p style={styles.infoLabel}>Response Time</p>
-              <p style={styles.infoValue}>Within 24 hours</p>
-            </div>
-          </div>
-          <div style={styles.infoItem}>
-            <span style={styles.infoIcon}>🏪</span>
-            <div>
-              <p style={styles.infoLabel}>For Restaurants</p>
-              <p style={styles.infoValue}>Listing issues, approvals, payments</p>
-            </div>
-          </div>
-          <div style={styles.infoItem}>
-            <span style={styles.infoIcon}>🤝</span>
-            <div>
-              <p style={styles.infoLabel}>For Volunteers & NGOs</p>
-              <p style={styles.infoValue}>Claim issues, refunds, support</p>
-            </div>
+  return (
+    <div style={styles.page}>
+      <div style={styles.wrap}>
+
+        {/* Hero */}
+        <div style={styles.hero}>
+          <div style={styles.heroContent}>
+            <div style={styles.heroBadge}>📬 Support</div>
+            <h1 style={styles.heroTitle}>How can we <span style={styles.heroOrange}>help you?</span></h1>
+            <p style={styles.heroSub}>Send us a message and we'll get back to you within 24 hours.</p>
           </div>
         </div>
-      </div>
 
-      <div style={styles.right}>
-        <div style={styles.card}>
-          <h3 style={styles.cardTitle}>✉️ Send us a Message</h3>
-          <p style={styles.cardSubtitle}>Admin will get back to you within 24 hours</p>
-
-          {status === 'success' && (
-            <div style={styles.successBox}>
-              <p style={styles.successText}>
-                ✅ Message sent successfully! Admin will respond within 24 hours.
-              </p>
-            </div>
-          )}
-
-          {status === 'error' && (
-            <div style={styles.errorBox}>
-              <p style={styles.errorText}>
-                ❌ Something went wrong. Please try again!
-              </p>
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit}>
-            <div style={styles.row}>
-              <div style={{ ...styles.field, flex: 1 }}>
-                <label style={styles.label}>Your Name</label>
-                <input
-                  style={styles.input}
-                  type="text"
-                  name="name"
-                  placeholder="Your full name"
-                  value={form.name}
-                  onChange={handleChange}
-                  required
-                />
+        <div style={styles.grid}>
+          {/* Info Cards */}
+          <div style={styles.leftCol}>
+            {[
+              { icon: '📧', label: 'Email Us', value: 'admin@aharasetu.com', sub: 'We reply within 24 hours' },
+              { icon: '⏰', label: 'Response Time', value: 'Within 24 hours', sub: 'Mon–Sat, 9am–6pm' },
+              { icon: '🏪', label: 'For Restaurants', value: 'Listing & payment support', sub: 'Approvals, refunds, issues' },
+              { icon: '🤝', label: 'For Volunteers', value: 'Claim & pickup support', sub: 'Refunds, reports, help' },
+            ].map((info, i) => (
+              <div key={i} style={styles.infoCard}>
+                <div style={styles.infoIcon}>{info.icon}</div>
+                <div>
+                  <p style={styles.infoLabel}>{info.label}</p>
+                  <p style={styles.infoValue}>{info.value}</p>
+                  <p style={styles.infoSub}>{info.sub}</p>
+                </div>
               </div>
-              <div style={{ ...styles.field, flex: 1 }}>
-                <label style={styles.label}>Your Role</label>
-                <select
-                  style={styles.input}
-                  name="role"
-                  value={form.role}
-                  onChange={handleChange}
-                  required
-                >
-                  <option value="">Select role</option>
-                  <option value="restaurant">Restaurant</option>
-                  <option value="volunteer">Volunteer</option>
-                  <option value="ngo">NGO</option>
-                  <option value="user">Regular User</option>
+            ))}
+          </div>
+
+          {/* Form */}
+          <div style={styles.formCard}>
+            <h2 style={styles.formTitle}>Send a Message</h2>
+            <p style={styles.formSub}>Fill in the details below and we'll get back to you.</p>
+
+            {status === 'success' && (
+              <div style={styles.successBox}>
+                <span style={styles.successIcon}>✅</span>
+                <div>
+                  <p style={styles.successTitle}>Message sent!</p>
+                  <p style={styles.successSub}>Admin will respond within 24 hours.</p>
+                </div>
+              </div>
+            )}
+            {status === 'error' && (
+              <div style={styles.errorBox}>❌ Something went wrong. Please try again.</div>
+            )}
+
+            <form onSubmit={handleSubmit} style={styles.form}>
+              <div style={styles.row}>
+                <div style={styles.field}>
+                  <label style={styles.label}>Your Name</label>
+                  <input style={styles.input} type="text" name="name"
+                    placeholder="Full name" value={form.name}
+                    onChange={handleChange} required />
+                </div>
+                <div style={styles.field}>
+                  <label style={styles.label}>Your Role</label>
+                  <select style={styles.input} name="role"
+                    value={form.role} onChange={handleChange} required>
+                    <option value="">Select role</option>
+                    <option value="restaurant">Restaurant</option>
+                    <option value="volunteer">Volunteer</option>
+                    <option value="ngo">NGO</option>
+                    <option value="user">Regular User</option>
+                  </select>
+                </div>
+              </div>
+              <div style={styles.field}>
+                <label style={styles.label}>Email Address</label>
+                <input style={styles.input} type="email" name="email"
+                  placeholder="your@email.com" value={form.email}
+                  onChange={handleChange} required />
+              </div>
+              <div style={styles.field}>
+                <label style={styles.label}>Subject</label>
+                <select style={styles.input} name="subject"
+                  value={form.subject} onChange={handleChange} required>
+                  {subjects.map(s => (
+                    <option key={s.value} value={s.value}>{s.label}</option>
+                  ))}
                 </select>
               </div>
-            </div>
-
-            <div style={styles.field}>
-              <label style={styles.label}>Your Email</label>
-              <input
-                style={styles.input}
-                type="email"
-                name="email"
-                placeholder="Your email address"
-                value={form.email}
-                onChange={handleChange}
-                required
-              />
-            </div>
-
-            <div style={styles.field}>
-              <label style={styles.label}>Subject</label>
-              <select
-                style={styles.input}
-                name="subject"
-                value={form.subject}
-                onChange={handleChange}
-                required
-              >
-                <option value="">Select a subject</option>
-                <option value="Listing Issue">🍱 Listing Issue</option>
-                <option value="Payment Issue">💳 Payment Issue</option>
-                <option value="Refund Request">💸 Refund Request</option>
-                <option value="Claim Issue">📦 Claim Issue</option>
-                <option value="Account Issue">👤 Account Issue</option>
-                <option value="Feedback">💬 Feedback</option>
-                <option value="Other">❓ Other</option>
-              </select>
-            </div>
-
-            <div style={styles.field}>
-              <label style={styles.label}>Message</label>
-              <textarea
-                style={{ ...styles.input, height: '130px', resize: 'vertical' }}
-                name="message"
-                placeholder="Describe your issue or message in detail..."
-                value={form.message}
-                onChange={handleChange}
-                required
-              />
-            </div>
-
-            <button
-              style={{
-                ...styles.btn,
-                opacity: loading ? 0.7 : 1,
-                cursor: loading ? 'not-allowed' : 'pointer'
-              }}
-              type="submit"
-              disabled={loading}
-            >
-              {loading ? '⏳ Sending...' : '📨 Send Message'}
-            </button>
-          </form>
+              <div style={styles.field}>
+                <label style={styles.label}>Message</label>
+                <textarea style={{ ...styles.input, height: '130px', resize: 'vertical' }}
+                  name="message" placeholder="Describe your issue in detail..."
+                  value={form.message} onChange={handleChange} required />
+              </div>
+              <button style={{ ...styles.submitBtn, opacity: loading ? 0.75 : 1 }}
+                type="submit" disabled={loading}>
+                {loading ? 'Sending...' : '📨 Send Message'}
+              </button>
+            </form>
+          </div>
         </div>
       </div>
     </div>
@@ -210,28 +146,35 @@ function ContactUs() {
 }
 
 const styles = {
-  container: { display: 'flex', gap: '30px', padding: '40px', backgroundColor: '#f1f8e9', minHeight: '100vh', flexWrap: 'wrap' },
-  left: { flex: 1, minWidth: '280px' },
-  leftTitle: { color: '#2e7d32', fontSize: '28px', marginBottom: '10px' },
-  leftSubtitle: { color: '#666', fontSize: '15px', marginBottom: '30px' },
-  infoBox: { display: 'flex', flexDirection: 'column', gap: '20px' },
-  infoItem: { display: 'flex', alignItems: 'flex-start', gap: '15px', backgroundColor: 'white', padding: '15px', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' },
-  infoIcon: { fontSize: '28px' },
-  infoLabel: { color: '#888', fontSize: '12px', margin: '0 0 4px', textTransform: 'uppercase', fontWeight: 'bold' },
-  infoValue: { color: '#333', fontSize: '14px', margin: 0 },
-  right: { flex: 2, minWidth: '320px' },
-  card: { backgroundColor: 'white', borderRadius: '12px', padding: '30px', boxShadow: '0 2px 12px rgba(0,0,0,0.1)' },
-  cardTitle: { color: '#2e7d32', marginBottom: '5px' },
-  cardSubtitle: { color: '#888', fontSize: '14px', marginBottom: '25px' },
-  field: { marginBottom: '18px' },
-  row: { display: 'flex', gap: '15px' },
-  label: { display: 'block', marginBottom: '6px', color: '#444', fontWeight: 'bold', fontSize: '14px' },
-  input: { width: '100%', padding: '10px 14px', borderRadius: '8px', border: '1px solid #ccc', fontSize: '15px', boxSizing: 'border-box' },
-  btn: { width: '100%', padding: '12px', backgroundColor: '#2e7d32', color: 'white', border: 'none', borderRadius: '8px', fontSize: '16px', cursor: 'pointer', marginTop: '5px' },
-  successBox: { backgroundColor: '#e8f5e9', padding: '15px', borderRadius: '8px', marginBottom: '20px' },
-  successText: { color: '#2e7d32', margin: 0, fontWeight: 'bold' },
-  errorBox: { backgroundColor: '#ffebee', padding: '15px', borderRadius: '8px', marginBottom: '20px' },
-  errorText: { color: '#c62828', margin: 0, fontWeight: 'bold' },
+  page: { minHeight: '100vh', background: '#FAFAFA', paddingTop: '64px' },
+  wrap: { maxWidth: '1100px', margin: '0 auto', padding: '0 24px 60px' },
+  hero: { background: 'linear-gradient(145deg, #1C1C1C, #2D2D2D)', borderRadius: '0 0 24px 24px', padding: '48px 40px', marginBottom: '40px', textAlign: 'center' },
+  heroContent: { maxWidth: '500px', margin: '0 auto' },
+  heroBadge: { display: 'inline-block', background: 'rgba(255,82,0,0.15)', border: '1px solid rgba(255,82,0,0.3)', color: '#FF8C00', fontSize: '0.75rem', fontWeight: '700', padding: '4px 14px', borderRadius: '20px', letterSpacing: '0.06em', marginBottom: '16px' },
+  heroTitle: { fontSize: 'clamp(1.6rem, 4vw, 2.4rem)', fontWeight: '800', color: 'white', letterSpacing: '-0.03em', marginBottom: '10px' },
+  heroOrange: { color: '#FF5200' },
+  heroSub: { fontSize: '0.95rem', color: 'rgba(255,255,255,0.45)', lineHeight: 1.7 },
+  grid: { display: 'grid', gridTemplateColumns: '280px 1fr', gap: '24px', alignItems: 'start' },
+  leftCol: { display: 'flex', flexDirection: 'column', gap: '12px' },
+  infoCard: { background: 'white', border: '1px solid #F0F0F0', borderRadius: '12px', padding: '16px', display: 'flex', alignItems: 'flex-start', gap: '12px', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' },
+  infoIcon: { width: '36px', height: '36px', borderRadius: '10px', background: '#FFF0EB', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1rem', flexShrink: 0 },
+  infoLabel: { fontSize: '0.68rem', fontWeight: '700', color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '2px' },
+  infoValue: { fontSize: '0.88rem', fontWeight: '600', color: '#1C1C1C', marginBottom: '2px' },
+  infoSub: { fontSize: '0.74rem', color: '#9CA3AF' },
+  formCard: { background: 'white', border: '1px solid #F0F0F0', borderRadius: '16px', padding: '32px', boxShadow: '0 2px 16px rgba(0,0,0,0.06)' },
+  formTitle: { fontSize: '1.3rem', fontWeight: '800', color: '#1C1C1C', letterSpacing: '-0.02em', marginBottom: '4px' },
+  formSub: { fontSize: '0.88rem', color: '#9CA3AF', marginBottom: '24px' },
+  successBox: { display: 'flex', alignItems: 'flex-start', gap: '12px', background: '#F0FDF4', border: '1px solid #BBF7D0', borderRadius: '10px', padding: '14px 16px', marginBottom: '20px' },
+  successIcon: { fontSize: '1.1rem', flexShrink: 0 },
+  successTitle: { fontSize: '0.9rem', fontWeight: '700', color: '#16A34A', marginBottom: '2px' },
+  successSub: { fontSize: '0.8rem', color: '#4ADE80' },
+  errorBox: { background: '#FEF2F2', border: '1px solid #FECACA', borderRadius: '10px', padding: '12px 16px', fontSize: '0.875rem', color: '#DC2626', marginBottom: '20px' },
+  form: { display: 'flex', flexDirection: 'column', gap: '16px' },
+  row: { display: 'flex', gap: '14px' },
+  field: { display: 'flex', flexDirection: 'column', gap: '6px', flex: 1 },
+  label: { fontSize: '0.82rem', fontWeight: '600', color: '#374151' },
+  input: { width: '100%', padding: '11px 14px', border: '1.5px solid #E5E7EB', borderRadius: '9px', fontSize: '0.92rem', color: '#1C1C1C', outline: 'none', background: '#FAFAFA', boxSizing: 'border-box', fontFamily: 'inherit' },
+  submitBtn: { width: '100%', padding: '13px', background: 'linear-gradient(135deg, #FF5200, #FF6B35)', color: 'white', border: 'none', borderRadius: '10px', fontSize: '0.95rem', fontWeight: '600', cursor: 'pointer', boxShadow: '0 4px 16px rgba(255,82,0,0.3)' },
 };
 
 export default ContactUs;

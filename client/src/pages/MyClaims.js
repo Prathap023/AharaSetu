@@ -26,7 +26,9 @@ function MyClaims() {
       const res = await axios.get('http://localhost:5000/api/food/my-claims', {
         headers: { Authorization: `Bearer ${token}` }
       });
-      setClaims(res.data);
+      setClaims(
+  res.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+);
       fetchMyRatings(res.data);
     } catch (err) { console.error(err); }
     setLoading(false);

@@ -26,7 +26,7 @@ function MyListings() {
       const res = await axios.get('http://localhost:5000/api/food/my-listings', {
         headers: { Authorization: `Bearer ${token}` }
       });
-      setListings(res.data);
+      setListings(res.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)));
     } catch (err) { console.error(err); }
     setLoading(false);
   };

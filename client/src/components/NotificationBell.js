@@ -12,23 +12,16 @@ function NotificationBell() {
   useEffect(() => {
     if (!token) return;
     fetchUnreadCount();
-    fetchNotifications();
-
-    // Auto refresh every 5 seconds
     const interval = setInterval(() => {
       fetchUnreadCount();
       if (isOpen) fetchNotifications();
     }, 5000);
-
     return () => clearInterval(interval);
   }, [token, isOpen]);
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (e) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
-        setIsOpen(false);
-      }
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) setIsOpen(false);
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
@@ -40,9 +33,7 @@ function NotificationBell() {
         headers: { Authorization: `Bearer ${token}` }
       });
       setUnreadCount(res.data.count);
-    } catch (err) {
-      console.error(err);
-    }
+    } catch (err) {}
   };
 
   const fetchNotifications = async () => {
@@ -51,40 +42,30 @@ function NotificationBell() {
         headers: { Authorization: `Bearer ${token}` }
       });
       setNotifications(res.data);
-    } catch (err) {
-      console.error(err);
-    }
+    } catch (err) {}
   };
 
-  const handleOpen = async () => {
+  const handleOpen = () => {
     setIsOpen(!isOpen);
-    if (!isOpen) {
-      fetchNotifications();
-    }
+    if (!isOpen) fetchNotifications();
   };
 
   const handleMarkAllRead = async () => {
     try {
-      await axios.put('http://localhost:5000/api/notifications/mark-all-read', {}, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await axios.put('http://localhost:5000/api/notifications/mark-all-read', {},
+        { headers: { Authorization: `Bearer ${token}` } });
       setUnreadCount(0);
       fetchNotifications();
-    } catch (err) {
-      console.error(err);
-    }
+    } catch (err) {}
   };
 
   const handleMarkOneRead = async (id) => {
     try {
-      await axios.put(`http://localhost:5000/api/notifications/mark-read/${id}`, {}, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await axios.put(`http://localhost:5000/api/notifications/mark-read/${id}`, {},
+        { headers: { Authorization: `Bearer ${token}` } });
       fetchUnreadCount();
       fetchNotifications();
-    } catch (err) {
-      console.error(err);
-    }
+    } catch (err) {}
   };
 
   const handleDeleteAll = async () => {
@@ -94,61 +75,45 @@ function NotificationBell() {
       });
       setNotifications([]);
       setUnreadCount(0);
-    } catch (err) {
-      console.error(err);
-    }
+    } catch (err) {}
   };
 
   const getTimeAgo = (date) => {
-    const seconds = Math.floor((new Date() - new Date(date)) / 1000);
-    if (seconds < 60) return 'just now';
-    if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
-    if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
-    return `${Math.floor(seconds / 86400)}d ago`;
+    const s = Math.floor((new Date() - new Date(date)) / 1000);
+    if (s < 60) return 'just now';
+    if (s < 3600) return `${Math.floor(s / 60)}m ago`;
+    if (s < 86400) return `${Math.floor(s / 3600)}h ago`;
+    return `${Math.floor(s / 86400)}d ago`;
   };
 
-  const getNotificationIcon = (type) => {
-    const icons = {
-      new_listing: '🍱',
-      listing_approved: '✅',
-      listing_rejected: '❌',
-      new_claim: '📦',
-      claim_approved: '✅',
-      claim_rejected: '❌',
-      payment_received: '💳',
-      both_acknowledged: '🔔',
-      transaction_completed: '🎉',
-    };
-    return icons[type] || '🔔';
-  };
+  const getIcon = (type) => ({
+    new_listing: '🍱', listing_approved: '✅', listing_rejected: '❌',
+    new_claim: '📦', claim_approved: '✅', claim_rejected: '❌',
+    payment_received: '💳', both_acknowledged: '🔔', transaction_completed: '🎉',
+  }[type] || '🔔');
 
   return (
-    <div style={styles.container} ref={dropdownRef}>
-      {/* Bell Button */}
+    <div style={styles.wrap} ref={dropdownRef}>
       <button style={styles.bellBtn} onClick={handleOpen}>
-        🔔
+        <span style={styles.bellIcon}>🔔</span>
         {unreadCount > 0 && (
-          <span style={styles.badge}>
-            {unreadCount > 9 ? '9+' : unreadCount}
-          </span>
+          <span style={styles.badge}>{unreadCount > 9 ? '9+' : unreadCount}</span>
         )}
       </button>
 
-      {/* Dropdown */}
       {isOpen && (
         <div style={styles.dropdown}>
-          {/* Header */}
           <div style={styles.dropdownHeader}>
-            <span style={styles.dropdownTitle}>
-              🔔 Notifications
+            <div style={styles.dropdownTitle}>
+              <span style={styles.dropdownTitleText}>Notifications</span>
               {unreadCount > 0 && (
-                <span style={styles.unreadBadge}>{unreadCount} new</span>
+                <span style={styles.unreadPill}>{unreadCount} new</span>
               )}
-            </span>
-            <div style={styles.headerBtns}>
+            </div>
+            <div style={styles.headerActions}>
               {unreadCount > 0 && (
                 <button style={styles.markReadBtn} onClick={handleMarkAllRead}>
-                  ✓ Mark all read
+                  Mark all read
                 </button>
               )}
               {notifications.length > 0 && (
@@ -159,32 +124,32 @@ function NotificationBell() {
             </div>
           </div>
 
-          {/* Notifications List */}
           <div style={styles.list}>
             {notifications.length === 0 ? (
               <div style={styles.empty}>
-                <p>🔔 No notifications yet</p>
-                <p style={styles.emptyHint}>You'll be notified about important updates here</p>
+                <div style={styles.emptyIcon}>🔔</div>
+                <p style={styles.emptyTitle}>All caught up!</p>
+                <p style={styles.emptySub}>No notifications yet</p>
               </div>
             ) : (
-              notifications.map(notif => (
+              notifications.map(n => (
                 <div
-                  key={notif._id}
+                  key={n._id}
                   style={{
                     ...styles.notifItem,
-                    backgroundColor: notif.isRead ? 'white' : '#f1f8e9',
-                    borderLeft: notif.isRead ? '3px solid #eee' : '3px solid #2e7d32',
+                    background: n.isRead ? 'white' : '#FFF8F5',
+                    borderLeft: n.isRead ? '3px solid transparent' : '3px solid #FF5200',
                   }}
-                  onClick={() => !notif.isRead && handleMarkOneRead(notif._id)}
+                  onClick={() => !n.isRead && handleMarkOneRead(n._id)}
                 >
-                  <div style={styles.notifIcon}>
-                    {getNotificationIcon(notif.type)}
+                  <div style={styles.notifIconWrap}>
+                    {getIcon(n.type)}
                   </div>
                   <div style={styles.notifContent}>
-                    <p style={styles.notifMessage}>{notif.message}</p>
-                    <p style={styles.notifTime}>{getTimeAgo(notif.createdAt)}</p>
+                    <p style={styles.notifMsg}>{n.message}</p>
+                    <p style={styles.notifTime}>{getTimeAgo(n.createdAt)}</p>
                   </div>
-                  {!notif.isRead && <div style={styles.unreadDot} />}
+                  {!n.isRead && <div style={styles.unreadDot} />}
                 </div>
               ))
             )}
@@ -196,134 +161,55 @@ function NotificationBell() {
 }
 
 const styles = {
-  container: { position: 'relative' },
+  wrap: { position: 'relative' },
   bellBtn: {
-    position: 'relative',
-    backgroundColor: 'transparent',
-    border: 'none',
-    fontSize: '22px',
-    cursor: 'pointer',
-    padding: '0 5px',
+    position: 'relative', background: '#F9FAFB',
+    border: '1px solid #E5E7EB', borderRadius: '10px',
+    width: '38px', height: '38px',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    cursor: 'pointer', transition: 'all 0.15s',
   },
+  bellIcon: { fontSize: '1rem' },
   badge: {
-    position: 'absolute',
-    top: '-8px',
-    right: '-8px',
-    backgroundColor: '#c62828',
-    color: 'white',
-    borderRadius: '50%',
-    width: '20px',
-    height: '20px',
-    fontSize: '11px',
-    fontWeight: 'bold',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
+    position: 'absolute', top: '-6px', right: '-6px',
+    background: '#FF5200', color: 'white',
+    borderRadius: '50%', width: '18px', height: '18px',
+    fontSize: '0.6rem', fontWeight: '800',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    border: '2px solid white',
   },
   dropdown: {
-    position: 'absolute',
-    right: 0,
-    top: '40px',
-    width: '360px',
-    backgroundColor: 'white',
-    borderRadius: '12px',
-    boxShadow: '0 8px 30px rgba(0,0,0,0.2)',
-    zIndex: 1000,
-    overflow: 'hidden',
+    position: 'absolute', right: 0, top: '46px',
+    width: '360px', background: 'white',
+    borderRadius: '16px', boxShadow: '0 8px 40px rgba(0,0,0,0.15)',
+    border: '1px solid #F0F0F0', zIndex: 1000, overflow: 'hidden',
   },
   dropdownHeader: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: '15px',
-    borderBottom: '1px solid #eee',
-    backgroundColor: '#f9fbe7',
+    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+    padding: '16px 18px', borderBottom: '1px solid #F3F4F6',
+    background: '#FAFAFA',
   },
-  dropdownTitle: {
-    fontWeight: 'bold',
-    color: '#2e7d32',
-    fontSize: '15px',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-  },
-  unreadBadge: {
-    backgroundColor: '#2e7d32',
-    color: 'white',
-    padding: '2px 8px',
-    borderRadius: '20px',
-    fontSize: '11px',
-  },
-  headerBtns: {
-    display: 'flex',
-    gap: '8px',
-    alignItems: 'center',
-  },
-  markReadBtn: {
-    backgroundColor: 'transparent',
-    border: '1px solid #2e7d32',
-    color: '#2e7d32',
-    padding: '4px 8px',
-    borderRadius: '6px',
-    cursor: 'pointer',
-    fontSize: '12px',
-  },
-  deleteBtn: {
-    backgroundColor: 'transparent',
-    border: '1px solid #ccc',
-    padding: '4px 8px',
-    borderRadius: '6px',
-    cursor: 'pointer',
-    fontSize: '12px',
-  },
-  list: {
-    maxHeight: '400px',
-    overflowY: 'auto',
-  },
+  dropdownTitle: { display: 'flex', alignItems: 'center', gap: '8px' },
+  dropdownTitleText: { fontSize: '0.92rem', fontWeight: '700', color: '#1C1C1C' },
+  unreadPill: { background: '#FF5200', color: 'white', fontSize: '0.65rem', fontWeight: '700', padding: '2px 8px', borderRadius: '20px' },
+  headerActions: { display: 'flex', gap: '6px', alignItems: 'center' },
+  markReadBtn: { background: 'none', border: '1px solid #E5E7EB', borderRadius: '6px', padding: '4px 10px', fontSize: '0.72rem', color: '#6B7280', cursor: 'pointer', fontWeight: '500' },
+  deleteBtn: { background: 'none', border: '1px solid #E5E7EB', borderRadius: '6px', padding: '4px 8px', fontSize: '0.8rem', cursor: 'pointer' },
+  list: { maxHeight: '380px', overflowY: 'auto' },
+  empty: { padding: '40px 20px', textAlign: 'center' },
+  emptyIcon: { fontSize: '2rem', marginBottom: '8px' },
+  emptyTitle: { fontSize: '0.9rem', fontWeight: '700', color: '#1C1C1C', marginBottom: '4px' },
+  emptySub: { fontSize: '0.78rem', color: '#9CA3AF' },
   notifItem: {
-    display: 'flex',
-    alignItems: 'flex-start',
-    gap: '10px',
-    padding: '12px 15px',
-    borderBottom: '1px solid #f5f5f5',
-    cursor: 'pointer',
-    transition: 'background 0.2s',
+    display: 'flex', alignItems: 'flex-start', gap: '10px',
+    padding: '13px 16px', borderBottom: '1px solid #F9FAFB',
+    cursor: 'pointer', transition: 'background 0.15s',
   },
-  notifIcon: {
-    fontSize: '20px',
-    minWidth: '30px',
-    textAlign: 'center',
-  },
+  notifIconWrap: { fontSize: '1.1rem', flexShrink: 0, marginTop: '1px' },
   notifContent: { flex: 1 },
-  notifMessage: {
-    color: '#333',
-    fontSize: '13px',
-    margin: '0 0 4px',
-    lineHeight: '1.4',
-  },
-  notifTime: {
-    color: '#999',
-    fontSize: '11px',
-    margin: 0,
-  },
-  unreadDot: {
-    width: '8px',
-    height: '8px',
-    borderRadius: '50%',
-    backgroundColor: '#2e7d32',
-    marginTop: '4px',
-    minWidth: '8px',
-  },
-  empty: {
-    textAlign: 'center',
-    padding: '40px 20px',
-    color: '#888',
-  },
-  emptyHint: {
-    fontSize: '12px',
-    color: '#bbb',
-    marginTop: '5px',
-  },
+  notifMsg: { fontSize: '0.82rem', color: '#1C1C1C', lineHeight: 1.45, marginBottom: '4px', fontWeight: '500' },
+  notifTime: { fontSize: '0.7rem', color: '#9CA3AF' },
+  unreadDot: { width: '8px', height: '8px', borderRadius: '50%', background: '#FF5200', flexShrink: 0, marginTop: '5px' },
 };
 
 export default NotificationBell;
