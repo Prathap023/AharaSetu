@@ -1,26 +1,11 @@
-const nodemailer = require('nodemailer');
-const dns = require('dns');
-dns.setDefaultResultOrder('ipv4first');
-
-const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 465,
-  secure: true,
-  family: 4,
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-  tls: {
-    rejectUnauthorized: false
-  }
-});
+const { Resend } = require('resend');
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const sendPaymentReceiptToVolunteer = async ({
   volunteerEmail, volunteerName, foodTitle, amount, paymentId, restaurantName, restaurantAddress, restaurantPhone,
 }) => {
-  await transporter.sendMail({
-    from: `"AharaSetu" <${process.env.EMAIL_FROM}>`,
+  await resend.emails.send({
+    from: 'AharaSetu <onboarding@resend.dev>',
     to: volunteerEmail,
     subject: `✅ Payment Receipt - ₹${amount} for ${foodTitle}`,
     html: `
@@ -59,8 +44,8 @@ const sendPaymentReceiptToVolunteer = async ({
 const sendPaymentNotificationToRestaurant = async ({
   restaurantEmail, restaurantName, foodTitle, amount, paymentId, volunteerName, volunteerEmail,
 }) => {
-  await transporter.sendMail({
-    from: `"AharaSetu" <${process.env.EMAIL_FROM}>`,
+  await resend.emails.send({
+    from: 'AharaSetu <onboarding@resend.dev>',
     to: restaurantEmail,
     subject: `💰 Payment Received - ₹${amount} for ${foodTitle}`,
     html: `
@@ -99,8 +84,8 @@ const sendPaymentNotificationToRestaurant = async ({
 const sendRefundNotification = async ({
   volunteerEmail, volunteerName, foodTitle, amount, paymentId,
 }) => {
-  await transporter.sendMail({
-    from: `"AharaSetu" <${process.env.EMAIL_FROM}>`,
+  await resend.emails.send({
+    from: 'AharaSetu <onboarding@resend.dev>',
     to: volunteerEmail,
     subject: `💸 Refund Processed - ₹${amount} for ${foodTitle}`,
     html: `
@@ -132,8 +117,8 @@ const sendRefundNotification = async ({
 };
 
 const sendPasswordResetEmail = async ({ email, name, resetUrl }) => {
-  await transporter.sendMail({
-    from: `"AharaSetu" <${process.env.EMAIL_FROM}>`,
+  await resend.emails.send({
+    from: 'AharaSetu <onboarding@resend.dev>',
     to: email,
     subject: `🔐 Password Reset Request - AharaSetu`,
     html: `
@@ -163,9 +148,10 @@ const sendPasswordResetEmail = async ({ email, name, resetUrl }) => {
     `
   });
 };
+
 const sendOTPEmail = async ({ email, name, otp }) => {
-  await transporter.sendMail({
-    from: `"AharaSetu" <${process.env.EMAIL_FROM}>`,
+  await resend.emails.send({
+    from: 'AharaSetu <onboarding@resend.dev>',
     to: email,
     subject: `🔐 Your OTP for AharaSetu Registration`,
     html: `

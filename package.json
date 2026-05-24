@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "brevo": "^1.0.0"
+    "brevo": "^1.0.0",
+    "resend": "^6.12.3"
   }
 }
