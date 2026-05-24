@@ -52,28 +52,27 @@ exports.getMyRating = async (req, res) => {
 // Get all ratings for a restaurant (for My Listings page)
 exports.getRestaurantRatings = async (req, res) => {
   try {
-
     const ratings = await Rating.find({
-      foodListing: req.params.restaurantId
+      restaurant: req.params.restaurantId,
     })
-      .populate('volunteer', 'name')
-      .populate('foodListing', 'title')
-      .sort({ createdAt: -1 });
+      .populate("volunteer", "name")
+      .populate("foodListing");
 
-    const avg = ratings.length
-      ? (ratings.reduce((sum, r) => sum + r.stars, 0) / ratings.length).toFixed(1)
-      : null;
-
-    res.json({
+    res.status(200).json({
+      success: true,
       ratings,
-      average: avg,
-      total: ratings.length
     });
+  } catch (error) {
+    console.error("Fetch ratings error:", error);
 
-  } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch ratings",
+    });
   }
 };
+
+
 // Get average rating for a restaurant (for Home page)
 exports.getRestaurantAverage = async (req, res) => {
   try {

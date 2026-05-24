@@ -323,6 +323,7 @@ function MyListings() {
                         {itemRating.comment && (
                           <p style={styles.ratingComment}>"{itemRating.comment}"</p>
                         )}
+                        {console.log(itemRating)}
                       </div>
                     )}
 
