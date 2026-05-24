@@ -69,7 +69,7 @@ function Navbar() {
                     }}>Contact</Link>
                     <a
                       href="https://aharasetu-report.onrender.com/"
-                      // target="_blank"
+                      target="_blank"
                       rel="noopener noreferrer"
                       style={{
                         ...styles.navLink,
