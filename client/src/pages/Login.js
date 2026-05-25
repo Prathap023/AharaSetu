@@ -86,12 +86,12 @@ function Login() {
         }}
       >
         <div style={styles.leftContent}>
-          <div style={styles.logo}>
+          {/* <div style={styles.logo}>
             <div style={styles.logoIcon}>🍱</div>
             <span style={styles.logoText}>
               AharaSetu
             </span>
-          </div>
+          </div> */}
 
           <h2
             style={{
