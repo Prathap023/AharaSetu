@@ -144,6 +144,7 @@ const sendPaymentReceiptToVolunteer = async ({
 
             <td style="
               font-family:monospace;
+              word-break:break-all;
             ">
               ${paymentId}
             </td>
