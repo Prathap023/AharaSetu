@@ -198,7 +198,7 @@ function Navbar() {
                   </>
                 ) : (
                   <>
-                    <Link to="/login" style={styles.registerBtn}>
+                    <Link to="/login" style={styles.loginBtn}>
                       Login
                     </Link>
 
@@ -356,7 +356,7 @@ function Navbar() {
 
               <Link
                 to="/login"
-                style={styles.mobileLink}
+                style={styles.mobileRegister}
                 onClick={closeMenu}
               >
                 Login
