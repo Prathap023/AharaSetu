@@ -2,12 +2,7 @@ const { Resend } = require('resend');
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-/* ------------------------------------------------ */
-/* BASE TEMPLATE */
-/* ------------------------------------------------ */
-
 const createEmailTemplate = ({
-  title,
   subtitle,
   content,
 }) => `
@@ -22,12 +17,23 @@ const createEmailTemplate = ({
   box-shadow: 0 10px 40px rgba(0,0,0,0.08);
 ">
 
-  <!-- HEADER -->
   <div style="
     background: linear-gradient(135deg,#FF5200,#FF8C00);
     padding: 32px 24px;
     text-align: center;
   ">
+
+    <img 
+      src="client/public/AharaSetu-logo-round.png"
+      width="120"
+      alt="AharaSetu"
+      style="
+        margin-bottom:16px;
+        border-radius:16px;
+        object-fit:cover;
+      "
+    />
+
     <h1 style="
       color: white;
       margin: 0;
@@ -35,7 +41,7 @@ const createEmailTemplate = ({
       font-weight: 800;
       letter-spacing: -0.03em;
     ">
-      🍱 AharaSetu
+      AharaSetu
     </h1>
 
     <p style="
@@ -48,7 +54,6 @@ const createEmailTemplate = ({
     </p>
   </div>
 
-  <!-- BODY -->
   <div style="
     padding: 36px 30px;
     color: #1C1C1C;
@@ -56,7 +61,6 @@ const createEmailTemplate = ({
     ${content}
   </div>
 
-  <!-- FOOTER -->
   <div style="
     background: #1C1C1C;
     padding: 18px;
@@ -74,10 +78,6 @@ const createEmailTemplate = ({
 </div>
 `;
 
-/* ------------------------------------------------ */
-/* COMMON BOX */
-/* ------------------------------------------------ */
-
 const infoBox = (content) => `
 <div style="
   background: #FFF7F2;
@@ -89,10 +89,6 @@ const infoBox = (content) => `
   ${content}
 </div>
 `;
-
-/* ------------------------------------------------ */
-/* PAYMENT RECEIPT */
-/* ------------------------------------------------ */
 
 const sendPaymentReceiptToVolunteer = async ({
   volunteerEmail,
@@ -207,10 +203,6 @@ const sendPaymentReceiptToVolunteer = async ({
   });
 };
 
-/* ------------------------------------------------ */
-/* RESTAURANT PAYMENT NOTIFICATION */
-/* ------------------------------------------------ */
-
 const sendPaymentNotificationToRestaurant = async ({
   restaurantEmail,
   restaurantName,
@@ -313,10 +305,6 @@ const sendPaymentNotificationToRestaurant = async ({
   });
 };
 
-/* ------------------------------------------------ */
-/* REFUND EMAIL */
-/* ------------------------------------------------ */
-
 const sendRefundNotification = async ({
   volunteerEmail,
   volunteerName,
@@ -401,10 +389,6 @@ const sendRefundNotification = async ({
   });
 };
 
-/* ------------------------------------------------ */
-/* PASSWORD RESET */
-/* ------------------------------------------------ */
-
 const sendPasswordResetEmail = async ({
   email,
   name,
@@ -487,10 +471,6 @@ const sendPasswordResetEmail = async ({
     html,
   });
 };
-
-/* ------------------------------------------------ */
-/* OTP EMAIL */
-/* ------------------------------------------------ */
 
 const sendOTPEmail = async ({
   email,
