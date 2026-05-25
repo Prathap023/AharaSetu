@@ -159,6 +159,7 @@ function Navbar() {
                   <Link to="/dashboard" style={styles.mobileLink} onClick={() => setMenuOpen(false)}>🍛 Post Food</Link>
                   <Link to="/my-listings" style={styles.mobileLink} onClick={() => setMenuOpen(false)}>📋 My Listings</Link>
                   <Link to="/contact" style={styles.mobileLink} onClick={() => setMenuOpen(false)}>📬 Contact</Link>
+                  <Link to="https://aharasetu-report.onrender.com/" style={styles.mobileLink} onClick={() => setMenuOpen(false)}>What We Have Done</Link>
                 </>
               )}
               {(user.role === 'volunteer' || user.role === 'ngo' || user.role === 'user') && (
