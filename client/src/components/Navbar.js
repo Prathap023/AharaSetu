@@ -198,7 +198,7 @@ function Navbar() {
                   </>
                 ) : (
                   <>
-                    <Link to="/login" style={styles.loginBtn}>
+                    <Link to="/login" style={styles.registerBtn}>
                       Login
                     </Link>
 
