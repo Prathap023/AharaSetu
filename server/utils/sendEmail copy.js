@@ -24,7 +24,7 @@ const createEmailTemplate = ({
   ">
 
     <img 
-      src="/AharaSetu-logo-round.png"
+      src="client/public/AharaSetu-logo-round.png"
       width="120"
       alt="AharaSetu"
       style="
