@@ -23,26 +23,16 @@ const createEmailTemplate = ({
     text-align: center;
   ">
 
-    <img 
-      src="/AharaSetu-logo-round.png"
-      width="120"
-      alt="AharaSetu"
-      style="
-        margin-bottom:16px;
-        border-radius:16px;
-        object-fit:cover;
-      "
-    />
-
     <h1 style="
-      color: white;
-      margin: 0;
-      font-size: 30px;
-      font-weight: 800;
-      letter-spacing: -0.03em;
-    ">
-      AharaSetu
-    </h1>
+  color: white;
+  margin: 0;
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+">
+  Ahara
+  <span style="color: black;">Setu</span>
+</h1>
 
     <p style="
       color: rgba(255,255,255,0.82);
