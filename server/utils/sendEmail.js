@@ -5,7 +5,7 @@ const sendPaymentReceiptToVolunteer = async ({
   volunteerEmail, volunteerName, foodTitle, amount, paymentId, restaurantName, restaurantAddress, restaurantPhone,
 }) => {
   await resend.emails.send({
-    from: 'AharaSetu payment@aharasetu.in',
+    from: 'AharaSetu <payment@aharasetu.in>',
     to: volunteerEmail,
     subject: `✅ Payment Receipt - ₹${amount} for ${foodTitle}`,
     html: `
@@ -45,7 +45,7 @@ const sendPaymentNotificationToRestaurant = async ({
   restaurantEmail, restaurantName, foodTitle, amount, paymentId, volunteerName, volunteerEmail,
 }) => {
   await resend.emails.send({
-    from: 'AharaSetu payment@aharasetu.in',
+    from: 'AharaSetu <payment@aharasetu.in>',
     to: restaurantEmail,
     subject: `💰 Payment Received - ₹${amount} for ${foodTitle}`,
     html: `
@@ -85,7 +85,7 @@ const sendRefundNotification = async ({
   volunteerEmail, volunteerName, foodTitle, amount, paymentId,
 }) => {
   await resend.emails.send({
-    from: 'AharaSetu refunds@aharasetu.in',
+    from: 'AharaSetu <refunds@aharasetu.in>',
     to: volunteerEmail,
     subject: `💸 Refund Processed - ₹${amount} for ${foodTitle}`,
     html: `
@@ -118,7 +118,7 @@ const sendRefundNotification = async ({
 
 const sendPasswordResetEmail = async ({ email, name, resetUrl }) => {
   await resend.emails.send({
-    from: 'AharaSetu reset-password@aharasetu.in',
+    from: 'AharaSetu <reset-password@aharasetu.in>',
     to: email,
     subject: `🔐 Password Reset Request - AharaSetu`,
     html: `
@@ -151,7 +151,7 @@ const sendPasswordResetEmail = async ({ email, name, resetUrl }) => {
 
 const sendOTPEmail = async ({ email, name, otp }) => {
   await resend.emails.send({
-    from: 'AharaSetu verification@aharasetu.in',
+    from: 'AharaSetu <verification@aharasetu.in>',
     to: email,
     subject: `🔐 Your OTP for AharaSetu Registration`,
     html: `
