@@ -83,29 +83,28 @@ exports.adminApproveListing = async (req, res) => {
 };
 
 // Admin reject listing
-exports.adminReject = async (req, res) => {
+exports.adminRejectListing = async (req, res) => {
   try {
-    const food = await FoodListing.findById(req.params.id);
-    if (!food) return res.status(404).json({ message: 'Listing not found' });
+    const food = await FoodListing.findByIdAndUpdate(
+      req.params.id,
+      { adminRejected: true, adminApproved: false },
+      { new: true }
+    );
 
-    food.adminRejected = true;
-    food.adminApproved = false;
-    food.rejectionReason = req.body.reason || 'Rejected by admin'; // ← add this
-
-    await food.save();
-
+    // Notify restaurant
     await createNotification({
       recipient: food.postedBy,
-      message: `❌ Your listing "${food.title}" was rejected. Reason: ${food.rejectionReason}`,
+      message: `❌ Your food listing "${food.title}" has been rejected by admin. Please contact admin for more details.`,
       type: 'listing_rejected',
       listingId: food._id
     });
 
-    res.json({ message: 'Listing rejected', food });
+    res.json(food);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(400).json({ message: err.message });
   }
 };
+
 // Claim listing (volunteer/NGO)
 exports.claimListing = async (req, res) => {
   try {

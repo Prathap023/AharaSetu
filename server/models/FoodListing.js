@@ -32,9 +32,6 @@ const foodSchema = new mongoose.Schema({
     default: 'available'
   },
 
-  // Rejection reason (if admin or restaurant rejects)
-  rejectionReason: { type: String, default: '' },
-
   // Payment
   paymentDone: { type: Boolean, default: false },
   paymentId: { type: String },
