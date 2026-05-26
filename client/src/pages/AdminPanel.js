@@ -3,6 +3,8 @@ import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
+const API = 'https://aharasetu-backend-pov2.onrender.com';
+
 function AdminPanel() {
   const { user, token } = useAuth();
   const navigate = useNavigate();
@@ -10,6 +12,9 @@ function AdminPanel() {
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState('');
   const [filter, setFilter] = useState('all');
+  const [rejectModal, setRejectModal] = useState(null);
+  const [rejectReason, setRejectReason] = useState('');
+  const [rejectLoading, setRejectLoading] = useState(false);
 
   useEffect(() => {
     if (!user || user.role !== 'admin') { navigate('/login'); return; }
@@ -20,7 +25,7 @@ function AdminPanel() {
 
   const fetchListings = async () => {
     try {
-      const res = await axios.get('https://aharasetu-backend-pov2.onrender.com/api/food/admin/all', {
+      const res = await axios.get(`${API}/api/food/admin/all`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setListings(res.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)));
@@ -30,25 +35,31 @@ function AdminPanel() {
 
   const handleApprove = async (id) => {
     try {
-      await axios.put(`https://aharasetu-backend-pov2.onrender.com/api/food/admin/approve/${id}`, {},
+      await axios.put(`${API}/api/food/admin/approve/${id}`, {},
         { headers: { Authorization: `Bearer ${token}` } });
       setMessage('✅ Listing approved!');
       fetchListings();
     } catch (err) { setMessage('❌ Something went wrong!'); }
   };
 
-  const handleReject = async (id) => {
+  const handleRejectSubmit = async () => {
+    if (!rejectReason.trim()) return;
+    setRejectLoading(true);
     try {
-      await axios.put(`https://aharasetu-backend-pov2.onrender.com/api/food/admin/reject/${id}`, {},
+      await axios.put(`${API}/api/food/admin/reject/${rejectModal}`,
+        { reason: rejectReason },
         { headers: { Authorization: `Bearer ${token}` } });
       setMessage('❌ Listing rejected!');
+      setRejectModal(null);
+      setRejectReason('');
       fetchListings();
     } catch (err) { setMessage('❌ Something went wrong!'); }
+    setRejectLoading(false);
   };
 
   const handleComplete = async (id) => {
     try {
-      await axios.put(`https://aharasetu-backend-pov2.onrender.com/api/food/admin/complete/${id}`, {},
+      await axios.put(`${API}/api/food/admin/complete/${id}`, {},
         { headers: { Authorization: `Bearer ${token}` } });
       setMessage('🎉 Transaction completed!');
       fetchListings();
@@ -105,6 +116,17 @@ function AdminPanel() {
     return true;
   });
 
+  const rejectReasons = [
+    'Food already expired',
+    'Insufficient food quantity',
+    'Duplicate listing',
+    'Inappropriate content',
+    'Incorrect food details',
+    'Restaurant not verified',
+    'Price too high',
+    'Other',
+  ];
+
   if (loading) return (
     <div style={styles.loadingPage}>
       <div style={styles.spinner} />
@@ -116,13 +138,12 @@ function AdminPanel() {
     <div style={styles.page}>
       <div style={styles.wrap}>
 
-        {/* Header */}
+        {/* Header — no admin badge */}
         <div style={styles.header}>
           <div>
             <h1 style={styles.title}>Admin Panel</h1>
             <p style={styles.sub}>Review listings, manage claims and complete transactions</p>
           </div>
-          <div style={styles.adminBadge}>🛡️ Admin</div>
         </div>
 
         {/* Stats */}
@@ -167,10 +188,7 @@ function AdminPanel() {
           {tabs.map(tab => (
             <button
               key={tab.key}
-              style={{
-                ...styles.tab,
-                ...(filter === tab.key ? styles.tabActive : {})
-              }}
+              style={{ ...styles.tab, ...(filter === tab.key ? styles.tabActive : {}) }}
               onClick={() => setFilter(tab.key)}
             >
               {tab.label}
@@ -233,6 +251,33 @@ function AdminPanel() {
                     <span style={styles.idValue}>{item._id}</span>
                   </div>
 
+                  {/* Payment Details — shown if paid */}
+                  {item.type === 'paid' && (
+                    <div style={styles.paymentBox}>
+                      <p style={styles.paymentTitle}>💳 Payment Details</p>
+                      <div style={styles.paymentRow}>
+                        <span style={styles.paymentLabel}>Amount</span>
+                        <span style={styles.paymentValue}>₹{item.price}</span>
+                      </div>
+                      <div style={styles.paymentRow}>
+                        <span style={styles.paymentLabel}>Status</span>
+                        <span style={{
+                          ...styles.paymentStatus,
+                          color: item.paymentDone ? '#16A34A' : '#D97706',
+                          background: item.paymentDone ? '#F0FDF4' : '#FFFBEB',
+                        }}>
+                          {item.paymentDone ? '✅ Paid' : '⏳ Pending'}
+                        </span>
+                      </div>
+                      {item.paymentId && (
+                        <div style={styles.paymentRow}>
+                          <span style={styles.paymentLabel}>Payment ID</span>
+                          <span style={styles.paymentId}>{item.paymentId}</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
                   {/* Restaurant Info */}
                   <div style={styles.infoBox}>
                     <div style={styles.infoRow}>
@@ -252,15 +297,23 @@ function AdminPanel() {
                     </div>
                     {item.claimedBy && (
                       <div style={{ ...styles.infoRow, marginTop: '8px', paddingTop: '8px', borderTop: '1px solid #F3F4F6' }}>
-                        <span style={styles.claimedTag}>Claimed by</span>
                         <span style={styles.infoIcon}>👤</span>
                         <div style={styles.infoContent}>
                           <span style={styles.infoName}>{item.claimedBy?.name}</span>
                           <span style={styles.infoSub}>{item.claimedBy?.email}</span>
                         </div>
+                        <span style={styles.claimedTag}>Claimed by</span>
                       </div>
                     )}
                   </div>
+
+                  {/* Rejection Reason — shown if rejected */}
+                  {item.adminRejected && item.rejectionReason && (
+                    <div style={styles.rejectionReasonBox}>
+                      <p style={styles.rejectionReasonLabel}>❌ Rejection Reason</p>
+                      <p style={styles.rejectionReasonText}>{item.rejectionReason}</p>
+                    </div>
+                  )}
 
                   {/* Ack Status */}
                   {ack && (
@@ -289,7 +342,7 @@ function AdminPanel() {
                       <button style={styles.approveBtn} onClick={() => handleApprove(item._id)}>
                         ✅ Approve
                       </button>
-                      <button style={styles.rejectBtn} onClick={() => handleReject(item._id)}>
+                      <button style={styles.rejectBtn} onClick={() => setRejectModal(item._id)}>
                         ❌ Reject
                       </button>
                     </div>
@@ -317,6 +370,58 @@ function AdminPanel() {
           </div>
         )}
       </div>
+
+      {/* Reject Modal */}
+      {rejectModal && (
+        <div style={styles.modalOverlay} onClick={() => setRejectModal(null)}>
+          <div style={styles.modal} onClick={e => e.stopPropagation()}>
+            <div style={styles.modalHeader}>
+              <h3 style={styles.modalTitle}>❌ Reject Listing</h3>
+              <button style={styles.modalClose} onClick={() => setRejectModal(null)}>✕</button>
+            </div>
+            <p style={styles.modalSub}>Select a reason for rejection. This will be shown to the restaurant.</p>
+
+            <div style={styles.reasonsGrid}>
+              {rejectReasons.map(reason => (
+                <button
+                  key={reason}
+                  style={{
+                    ...styles.reasonBtn,
+                    ...(rejectReason === reason ? styles.reasonBtnActive : {})
+                  }}
+                  onClick={() => setRejectReason(reason)}
+                >
+                  {reason}
+                </button>
+              ))}
+            </div>
+
+            <div style={styles.customReasonWrap}>
+              <label style={styles.customReasonLabel}>Or type a custom reason:</label>
+              <textarea
+                style={styles.customReasonInput}
+                placeholder="Enter custom rejection reason..."
+                value={rejectReason}
+                onChange={e => setRejectReason(e.target.value)}
+                rows={2}
+              />
+            </div>
+
+            <div style={styles.modalFooter}>
+              <button style={styles.modalCancelBtn} onClick={() => setRejectModal(null)}>
+                Cancel
+              </button>
+              <button
+                style={{ ...styles.modalRejectBtn, opacity: rejectLoading || !rejectReason.trim() ? 0.7 : 1 }}
+                onClick={handleRejectSubmit}
+                disabled={rejectLoading || !rejectReason.trim()}
+              >
+                {rejectLoading ? 'Rejecting...' : '❌ Confirm Reject'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -327,12 +432,11 @@ const styles = {
   loadingPage: { minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '16px', paddingTop: '64px' },
   spinner: { width: '36px', height: '36px', border: '3px solid #F3F4F6', borderTop: '3px solid #FF5200', borderRadius: '50%', animation: 'spin 0.8s linear infinite' },
   loadingText: { color: '#9CA3AF', fontSize: '0.9rem' },
-  header: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '28px', gap: '16px' },
+  header: { marginBottom: '28px' },
   title: { fontSize: '1.8rem', fontWeight: '800', color: '#1C1C1C', letterSpacing: '-0.02em', marginBottom: '4px' },
   sub: { fontSize: '0.9rem', color: '#9CA3AF' },
-  adminBadge: { padding: '8px 16px', borderRadius: '10px', background: 'linear-gradient(135deg, #1C1C1C, #2D2D2D)', color: 'white', fontSize: '0.85rem', fontWeight: '700' },
   statsGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '12px', marginBottom: '24px' },
-  statCard: { background: 'white', borderRadius: '12px', padding: '18px 16px', textAlign: 'center', border: '1px solid #F0F0F0', boxShadow: '0 1px 4px rgba(0,0,0,0.04)', transition: 'transform 0.15s' },
+  statCard: { background: 'white', borderRadius: '12px', padding: '18px 16px', textAlign: 'center', border: '1px solid #F0F0F0', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' },
   statIcon: { fontSize: '1.4rem', marginBottom: '8px', display: 'block' },
   statNum: { display: 'block', fontSize: '1.8rem', fontWeight: '800', color: '#FF5200', lineHeight: 1, marginBottom: '4px' },
   statLbl: { display: 'block', fontSize: '0.7rem', color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.06em' },
@@ -355,6 +459,13 @@ const styles = {
   idBox: { background: '#F9FAFB', borderRadius: '8px', padding: '8px 12px', display: 'flex', alignItems: 'center', gap: '8px', border: '1px solid #E5E7EB' },
   idLabel: { fontSize: '0.65rem', fontWeight: '700', color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.08em', flexShrink: 0 },
   idValue: { fontSize: '0.72rem', color: '#374151', fontFamily: 'monospace', wordBreak: 'break-all' },
+  paymentBox: { background: '#EFF6FF', border: '1px solid #BFDBFE', borderRadius: '10px', padding: '12px 14px' },
+  paymentTitle: { fontSize: '0.75rem', fontWeight: '700', color: '#1D4ED8', marginBottom: '8px' },
+  paymentRow: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' },
+  paymentLabel: { fontSize: '0.75rem', color: '#6B7280' },
+  paymentValue: { fontSize: '0.88rem', fontWeight: '700', color: '#1C1C1C' },
+  paymentStatus: { fontSize: '0.72rem', fontWeight: '700', padding: '2px 8px', borderRadius: '10px' },
+  paymentId: { fontSize: '0.68rem', fontFamily: 'monospace', color: '#374151', wordBreak: 'break-all', maxWidth: '160px', textAlign: 'right' },
   infoBox: { background: '#F9FAFB', borderRadius: '10px', padding: '12px', border: '1px solid #E5E7EB' },
   infoRow: { display: 'flex', alignItems: 'flex-start', gap: '8px', marginBottom: '6px' },
   infoIcon: { fontSize: '0.85rem', flexShrink: 0, marginTop: '1px' },
@@ -362,6 +473,9 @@ const styles = {
   infoName: { fontSize: '0.84rem', fontWeight: '600', color: '#1C1C1C' },
   infoSub: { fontSize: '0.74rem', color: '#9CA3AF' },
   claimedTag: { fontSize: '0.62rem', fontWeight: '700', color: '#2563EB', background: '#EFF6FF', padding: '2px 8px', borderRadius: '10px', flexShrink: 0 },
+  rejectionReasonBox: { background: '#FEF2F2', border: '1px solid #FECACA', borderRadius: '8px', padding: '10px 13px' },
+  rejectionReasonLabel: { fontSize: '0.72rem', fontWeight: '700', color: '#DC2626', marginBottom: '4px' },
+  rejectionReasonText: { fontSize: '0.83rem', color: '#374151' },
   ackBox: { padding: '10px 13px', borderRadius: '8px', border: '1px solid' },
   ackRow: { marginBottom: '6px' },
   ackChecks: { display: 'flex', flexDirection: 'column', gap: '3px' },
@@ -372,6 +486,21 @@ const styles = {
   completedTag: { textAlign: 'center', fontSize: '0.84rem', color: '#16A34A', fontWeight: '700', padding: '10px', background: '#F0FDF4', borderRadius: '8px' },
   approvedTag: { textAlign: 'center', fontSize: '0.8rem', color: '#16A34A', fontWeight: '600', padding: '8px', background: '#F0FDF4', borderRadius: '8px' },
   rejectedTag: { textAlign: 'center', fontSize: '0.8rem', color: '#DC2626', fontWeight: '600', padding: '8px', background: '#FEF2F2', borderRadius: '8px' },
+  modalOverlay: { position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', backdropFilter: 'blur(4px)' },
+  modal: { background: 'white', borderRadius: '16px', width: '100%', maxWidth: '480px', boxShadow: '0 20px 60px rgba(0,0,0,0.2)', overflow: 'hidden' },
+  modalHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 24px 16px', borderBottom: '1px solid #F3F4F6' },
+  modalTitle: { fontSize: '1.1rem', fontWeight: '800', color: '#1C1C1C' },
+  modalClose: { background: '#F3F4F6', border: 'none', borderRadius: '50%', width: '32px', height: '32px', cursor: 'pointer', fontSize: '14px', color: '#6B7280' },
+  modalSub: { fontSize: '0.85rem', color: '#9CA3AF', padding: '12px 24px 0' },
+  reasonsGrid: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', padding: '16px 24px' },
+  reasonBtn: { padding: '9px 12px', borderRadius: '8px', border: '1.5px solid #E5E7EB', background: '#FAFAFA', fontSize: '0.8rem', color: '#374151', cursor: 'pointer', fontWeight: '500', textAlign: 'left', transition: 'all 0.15s' },
+  reasonBtnActive: { border: '1.5px solid #DC2626', background: '#FEF2F2', color: '#DC2626', fontWeight: '700' },
+  customReasonWrap: { padding: '0 24px 16px' },
+  customReasonLabel: { display: 'block', fontSize: '0.8rem', fontWeight: '600', color: '#374151', marginBottom: '6px' },
+  customReasonInput: { width: '100%', padding: '10px 13px', border: '1.5px solid #E5E7EB', borderRadius: '9px', fontSize: '0.88rem', color: '#1C1C1C', outline: 'none', resize: 'none', fontFamily: 'inherit', boxSizing: 'border-box' },
+  modalFooter: { display: 'flex', gap: '10px', padding: '16px 24px', borderTop: '1px solid #F3F4F6' },
+  modalCancelBtn: { flex: 1, padding: '11px', background: 'white', border: '1.5px solid #E5E7EB', borderRadius: '9px', fontSize: '0.9rem', color: '#6B7280', cursor: 'pointer', fontWeight: '500' },
+  modalRejectBtn: { flex: 2, padding: '11px', background: 'linear-gradient(135deg, #DC2626, #EF4444)', color: 'white', border: 'none', borderRadius: '9px', fontSize: '0.9rem', fontWeight: '700', cursor: 'pointer' },
 };
 
 export default AdminPanel;
