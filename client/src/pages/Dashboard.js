@@ -13,7 +13,7 @@ function Dashboard() {
   quantityUnit: 'plates',
   expiryTime: '',
   type: 'free',
-  price: 0,
+  pricePerUnit: 0,
   address: '',
   phone: '',
   contactEmail: '',
@@ -189,16 +189,26 @@ function Dashboard() {
                 </button>
               </div>
               {form.type === 'paid' && (
-                <div style={{ ...styles.field, marginTop: '16px' }}>
-                  <label style={styles.label}>Price (₹) *</label>
-                  <div style={styles.priceWrap}>
-                    <span style={styles.rupeeSymbol}>₹</span>
-                    <input style={{ ...styles.input, paddingLeft: '32px' }}
-                      type="number" name="price" placeholder="0"
-                      value={form.price} onChange={handleChange} min="1" />
-                  </div>
-                </div>
-              )}
+  <div style={{ ...styles.field, marginTop: '16px' }}>
+    <label style={styles.label}>Price per {form.quantityUnit === 'kg' ? 'kg' : 'plate'} (₹) *</label>
+    <div style={styles.priceWrap}>
+      <span style={styles.rupeeSymbol}>₹</span>
+      <input
+        style={{ ...styles.input, paddingLeft: '32px' }}
+        type="number"
+        name="pricePerUnit"
+        placeholder="e.g. 20"
+        value={form.pricePerUnit}
+        onChange={handleChange}
+        min="1"
+        required
+      />
+    </div>
+    <p style={{ fontSize: '0.76rem', color: '#9CA3AF', marginTop: '4px' }}>
+      Total listing value: ₹{(form.pricePerUnit || 0) * (form.quantityNumber || 0)}
+    </p>
+  </div>
+)}
             </div>
 
             {/* Section: Contact & Location */}

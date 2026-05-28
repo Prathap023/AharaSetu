@@ -233,28 +233,25 @@ function Payment() {
           <p style={styles.subtitle}>Powered by Stripe</p>
         </div>
 
-        <div style={styles.orderSummary}>
-          <h3 style={styles.summaryTitle}>🧾 Order Summary</h3>
-          <div style={styles.summaryRow}>
-            <span>Food Item</span>
-            <span><strong>{food.title}</strong></span>
-          </div>
-          <div style={styles.summaryRow}>
-            <span>Quantity</span>
-            <span>{food.quantity}</span>
-          </div>
-          <div style={{
-            ...styles.summaryRow,
-            borderTop: '2px solid #2e7d32',
-            paddingTop: '10px',
-            marginTop: '5px'
-          }}>
-            <span><strong>Total Amount</strong></span>
-            <span style={{ color: '#2e7d32', fontWeight: 'bold', fontSize: '18px' }}>
-              ₹{food.price}
-            </span>
-          </div>
-        </div>
+       <div style={styles.orderSummary}>
+  <p style={styles.summaryTitle}>Order Summary</p>
+  <div style={styles.summaryRow}>
+    <span>Item</span>
+    <span>{food?.title}</span>
+  </div>
+  <div style={styles.summaryRow}>
+    <span>Quantity</span>
+    <span>{food?.claimedQuantity} {food?.quantityUnit}</span>
+  </div>
+  <div style={styles.summaryRow}>
+    <span>Price per {food?.quantityUnit === 'kg' ? 'kg' : 'plate'}</span>
+    <span>₹{food?.pricePerUnit}</span>
+  </div>
+  <div style={{ ...styles.summaryRow, borderTop: '1px solid #E5E7EB', paddingTop: '10px', marginTop: '6px', fontWeight: '700', fontSize: '1rem', color: '#1C1C1C' }}>
+    <span>Total</span>
+    <span>₹{food?.price}</span>
+  </div>
+</div>
 
         <div style={styles.stripeBox}>
           <span style={styles.stripeLogo}>stripe</span>

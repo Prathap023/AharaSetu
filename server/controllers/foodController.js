@@ -11,12 +11,25 @@ const {
 // Create listing (restaurant)
 exports.createListing = async (req, res) => {
   try {
-    const { quantityNumber, quantityUnit, ...rest } = req.body;
+    const {
+      title, description, quantityNumber, quantityUnit,
+      expiryTime, type, pricePerUnit, address, phone, contactEmail
+    } = req.body;
+
     const food = await FoodListing.create({
-      ...rest,
-      quantityNumber,
+      title,
+      description,
+      quantity: `${quantityNumber} ${quantityUnit}`, // for display
+      quantityNumber: parseInt(quantityNumber),
       quantityUnit: quantityUnit || 'plates',
-      remainingQuantity: quantityNumber,
+      remainingQuantity: parseInt(quantityNumber),
+      expiryTime,
+      type,
+      pricePerUnit: type === 'paid' ? parseFloat(pricePerUnit) : 0,
+      price: type === 'paid' ? parseFloat(pricePerUnit) : 0, // price per unit
+      address,
+      phone,
+      contactEmail,
       postedBy: req.user.id,
     });
 
@@ -119,7 +132,9 @@ exports.adminRejectListing = async (req, res) => {
 // Claim listing (volunteer/NGO)
 exports.claimListing = async (req, res) => {
   try {
-    const food = await FoodListing.findById(req.params.id).populate('postedBy', 'name email');
+    const food = await FoodListing.findById(req.params.id)
+      .populate('postedBy', 'name email');
+
     if (!food) return res.status(404).json({ message: 'Listing not found' });
     if (food.status !== 'available') return res.status(400).json({ message: 'Listing not available' });
 
@@ -127,7 +142,9 @@ exports.claimListing = async (req, res) => {
 
     // Check remaining quantity
     if (requestedQty > food.remainingQuantity) {
-      return res.status(400).json({ message: `Only ${food.remainingQuantity} ${food.quantityUnit} available` });
+      return res.status(400).json({
+        message: `Only ${food.remainingQuantity} ${food.quantityUnit} available`
+      });
     }
 
     // Regular user restrictions
@@ -138,31 +155,62 @@ exports.claimListing = async (req, res) => {
       if (requestedQty > 2) {
         return res.status(400).json({ message: 'Regular users can claim maximum 2 plates per order' });
       }
-      // Check daily limit (3 orders per day)
+      // Check daily limit
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       const todayClaims = await FoodListing.countDocuments({
         claimedBy: req.user.id,
         updatedAt: { $gte: today },
-        status: { $in: ['claimed', 'completed', 'pending_restaurant_approval', 'pending_payment'] }
       });
       if (todayClaims >= 3) {
-        return res.status(400).json({ message: 'Regular users can only claim 3 meals per day' });
+        return res.status(400).json({ message: 'You have reached your daily limit of 3 claims' });
       }
     }
 
-    // Deduct quantity
+    // Calculate total price for this claim
+    const totalPrice = food.type === 'paid'
+      ? food.pricePerUnit * requestedQty
+      : 0;
+
+    // Deduct from remaining quantity
     food.remainingQuantity -= requestedQty;
     food.claimedQuantity = requestedQty;
+    food.claimedBy = req.user.id;
 
+    // Calculate total price for payment
+    food.price = totalPrice;
+
+    // Keep listing LIVE if remaining > 0, otherwise mark as claimed
     if (food.type === 'paid') {
       food.status = 'pending_payment';
     } else {
       food.status = 'pending_restaurant_approval';
     }
 
-    food.claimedBy = req.user.id;
     await food.save();
+
+    // If remaining quantity > 0 — create a new duplicate listing
+    // with the remaining quantity so others can still claim
+    if (food.remainingQuantity > 0) {
+      await FoodListing.create({
+        title: food.title,
+        description: food.description,
+        quantity: `${food.remainingQuantity} ${food.quantityUnit}`,
+        quantityNumber: food.remainingQuantity,
+        quantityUnit: food.quantityUnit,
+        remainingQuantity: food.remainingQuantity,
+        expiryTime: food.expiryTime,
+        type: food.type,
+        pricePerUnit: food.pricePerUnit,
+        price: food.pricePerUnit,
+        address: food.address,
+        phone: food.phone,
+        contactEmail: food.contactEmail,
+        postedBy: food.postedBy._id,
+        adminApproved: true, // auto-approved since original was approved
+        status: 'available',
+      });
+    }
 
     await createNotification({
       recipient: food.postedBy._id,
@@ -171,7 +219,7 @@ exports.claimListing = async (req, res) => {
       listingId: food._id,
     });
 
-    res.json({ message: 'Food claimed successfully!', food });
+    res.json({ message: 'Food claimed!', food, totalPrice });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -444,22 +492,31 @@ exports.adminComplete = async (req, res) => {
 // Get payment intent for existing claim
 exports.getPaymentIntent = async (req, res) => {
   try {
-    const food = await FoodListing.findById(req.params.id)
-      .populate('postedBy', 'name email phone address');
-
+    const food = await FoodListing.findById(req.params.id);
     if (!food) return res.status(404).json({ message: 'Listing not found' });
-    if (food.status !== 'pending_payment')
-      return res.status(400).json({ message: 'Payment not required' });
 
-    // Always create a fresh payment intent
-    const { createPaymentIntent } = require('../utils/stripeHelper');
-    const paymentIntent = await createPaymentIntent(food.price);
-    food.paymentIntentId = paymentIntent.id;
-    await food.save();
+    // Total = pricePerUnit × claimedQuantity
+    const totalAmount = food.pricePerUnit * food.claimedQuantity;
 
-    res.json({ food, clientSecret: paymentIntent.client_secret });
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: Math.round(totalAmount * 100), // in paise
+      currency: 'inr',
+      metadata: {
+        foodId: food._id.toString(),
+        userId: req.user.id,
+        quantity: food.claimedQuantity,
+        pricePerUnit: food.pricePerUnit,
+        totalAmount,
+      }
+    });
+
+    res.json({
+      clientSecret: paymentIntent.client_secret,
+      totalAmount,
+      pricePerUnit: food.pricePerUnit,
+      quantity: food.claimedQuantity,
+    });
   } catch (err) {
-    console.error('Payment intent error:', err);
     res.status(500).json({ message: err.message });
   }
 };

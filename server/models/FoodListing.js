@@ -42,10 +42,11 @@ const foodSchema = new mongoose.Schema({
   restaurantRejected: { type: Boolean, default: false },
 
   // Partial claim fields
-  quantityUnit: { type: String, enum: ['plates', 'kg'], default: 'plates' },
-  quantityNumber: { type: Number, default: 0 },
-  remainingQuantity: { type: Number, default: 0 },
-  claimedQuantity: { type: Number, default: 0 },
+pricePerUnit: { type: Number, default: 0 },      // price per plate/kg
+quantityNumber: { type: Number, default: 0 },     // total quantity posted
+quantityUnit: { type: String, enum: ['plates', 'kg'], default: 'plates' },
+remainingQuantity: { type: Number, default: 0 },  // remaining after claims
+claimedQuantity: { type: Number, default: 0 },    // quantity this claimer took
 
   // ✅ NEW: Acknowledgement fields
   restaurantProvided: { type: Boolean, default: false },
