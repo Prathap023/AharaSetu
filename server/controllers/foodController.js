@@ -495,28 +495,45 @@ exports.getPaymentIntent = async (req, res) => {
     const food = await FoodListing.findById(req.params.id);
     if (!food) return res.status(404).json({ message: 'Listing not found' });
 
-    // Total = pricePerUnit × claimedQuantity
-    const totalAmount = food.pricePerUnit * food.claimedQuantity;
+    // Calculate total from pricePerUnit × claimedQuantity
+    const qty = food.claimedQuantity || 1;
+    const pricePerUnit = food.pricePerUnit || food.price || 0;
+    const totalAmount = pricePerUnit * qty;
 
+    console.log('Payment intent:', { qty, pricePerUnit, totalAmount });
+
+    // Create fresh payment intent every time
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: Math.round(totalAmount * 100), // in paise
+      amount: Math.round(totalAmount * 100), // paise
       currency: 'inr',
       metadata: {
         foodId: food._id.toString(),
         userId: req.user.id,
-        quantity: food.claimedQuantity,
-        pricePerUnit: food.pricePerUnit,
+        quantity: qty,
+        pricePerUnit,
         totalAmount,
       }
     });
 
+    // Update food with latest payment intent
+    food.paymentIntentId = paymentIntent.id;
+    food.price = totalAmount; // update total price
+    await food.save();
+
     res.json({
       clientSecret: paymentIntent.client_secret,
-      totalAmount,
-      pricePerUnit: food.pricePerUnit,
-      quantity: food.claimedQuantity,
+      food: {
+        _id: food._id,
+        title: food.title,
+        claimedQuantity: qty,
+        quantityUnit: food.quantityUnit || 'plates',
+        pricePerUnit,
+        price: totalAmount,
+        status: food.status,
+      }
     });
   } catch (err) {
+    console.error('getPaymentIntent error:', err);
     res.status(500).json({ message: err.message });
   }
 };

@@ -234,24 +234,24 @@ function Payment() {
         </div>
 
        <div style={styles.orderSummary}>
-  <p style={styles.summaryTitle}>Order Summary</p>
-  <div style={styles.summaryRow}>
-    <span>Item</span>
-    <span>{food?.title}</span>
-  </div>
-  <div style={styles.summaryRow}>
-    <span>Quantity</span>
-    <span>{food?.claimedQuantity} {food?.quantityUnit}</span>
-  </div>
-  <div style={styles.summaryRow}>
-    <span>Price per {food?.quantityUnit === 'kg' ? 'kg' : 'plate'}</span>
-    <span>₹{food?.pricePerUnit}</span>
-  </div>
-  <div style={{ ...styles.summaryRow, borderTop: '1px solid #E5E7EB', paddingTop: '10px', marginTop: '6px', fontWeight: '700', fontSize: '1rem', color: '#1C1C1C' }}>
-    <span>Total</span>
-    <span>₹{food?.price}</span>
-  </div>
-</div>
+        <p style={styles.summaryTitle}>Order Summary</p>
+        <div style={styles.summaryRow}>
+          <span>Item</span>
+          <span>{food?.title}</span>
+        </div>
+        <div style={styles.summaryRow}>
+          <span>Quantity</span>
+          <span>{food?.claimedQuantity} {food?.quantityUnit}</span>
+        </div>
+        <div style={styles.summaryRow}>
+          <span>Price per {food?.quantityUnit === 'kg' ? 'kg' : 'plate'}</span>
+          <span>₹{food?.pricePerUnit}</span>
+        </div>
+        <div style={{ ...styles.summaryRow, borderTop: '1px solid #E5E7EB', paddingTop: '10px', marginTop: '6px', fontWeight: '700', fontSize: '1rem', color: '#1C1C1C' }}>
+          <span>Total</span>
+          <span>₹{food?.price}</span>
+        </div>
+      </div>
 
         <div style={styles.stripeBox}>
           <span style={styles.stripeLogo}>stripe</span>
