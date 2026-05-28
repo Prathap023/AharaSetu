@@ -503,17 +503,16 @@ exports.getPaymentIntent = async (req, res) => {
     console.log('Payment intent:', { qty, pricePerUnit, totalAmount });
 
     // Create fresh payment intent every time
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: Math.round(totalAmount * 100), // paise
-      currency: 'inr',
-      metadata: {
-        foodId: food._id.toString(),
-        userId: req.user.id,
-        quantity: qty,
-        pricePerUnit,
-        totalAmount,
-      }
-    });
+    const paymentIntent = await createPaymentIntent(
+  Math.round(totalAmount * 100),
+  {
+    foodId: food._id.toString(),
+    userId: req.user.id,
+    quantity: qty,
+    pricePerUnit,
+    totalAmount,
+  }
+);
 
     // Update food with latest payment intent
     food.paymentIntentId = paymentIntent.id;
