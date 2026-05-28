@@ -11,14 +11,25 @@ const {
 // Create listing (restaurant)
 exports.createListing = async (req, res) => {
   try {
-    const food = await FoodListing.create({ ...req.body, postedBy: req.user.id });
+    const { quantityNumber, quantityUnit, ...rest } = req.body;
+    const food = await FoodListing.create({
+      ...rest,
+      quantityNumber,
+      quantityUnit: quantityUnit || 'plates',
+      remainingQuantity: quantityNumber,
+      postedBy: req.user.id,
+    });
 
     // Notify all admins
-    await notifyAllAdmins({
-      message: `🍱 New food listing "${food.title}" has been posted and needs your approval!`,
-      type: 'new_listing',
-      listingId: food._id
-    });
+    const admins = await User.find({ role: 'admin' });
+    for (const admin of admins) {
+      await createNotification({
+        recipient: admin._id,
+        message: `New listing "${food.title}" posted by ${req.user.name}`,
+        type: 'new_listing',
+        listingId: food._id,
+      });
+    }
 
     res.status(201).json(food);
   } catch (err) {
@@ -108,42 +119,61 @@ exports.adminRejectListing = async (req, res) => {
 // Claim listing (volunteer/NGO)
 exports.claimListing = async (req, res) => {
   try {
-    const food = await FoodListing.findById(req.params.id);
+    const food = await FoodListing.findById(req.params.id).populate('postedBy', 'name email');
     if (!food) return res.status(404).json({ message: 'Listing not found' });
-    if (!food.adminApproved) return res.status(400).json({ message: 'Not approved by admin yet' });
+    if (food.status !== 'available') return res.status(400).json({ message: 'Listing not available' });
 
-    if (food.type === 'free') {
-      food.status = 'pending_restaurant_approval';
-      food.claimedBy = req.user.id;
-      await food.save();
+    const requestedQty = parseInt(req.body.quantity) || 1;
 
-      // Notify restaurant
-      await createNotification({
-        recipient: food.postedBy,
-        message: `🙏 Someone has claimed your free food listing "${food.title}"! Please approve or reject.`,
-        type: 'new_claim',
-        listingId: food._id
-      });
-
-      return res.json({ message: 'Claim requested! Waiting for restaurant approval.', food });
-    } else {
-      food.status = 'pending_payment';
-      food.claimedBy = req.user.id;
-      food.paymentIntentId = null;
-      await food.save();
-
-      // Notify restaurant
-      await createNotification({
-        recipient: food.postedBy,
-        message: `💳 Someone is paying for your food listing "${food.title}"! Waiting for payment.`,
-        type: 'new_claim',
-        listingId: food._id
-      });
-
-      return res.json({ message: 'Proceed to payment!', food });
+    // Check remaining quantity
+    if (requestedQty > food.remainingQuantity) {
+      return res.status(400).json({ message: `Only ${food.remainingQuantity} ${food.quantityUnit} available` });
     }
+
+    // Regular user restrictions
+    if (req.user.role === 'user') {
+      if (food.quantityUnit === 'kg') {
+        return res.status(400).json({ message: 'Regular users can only claim plate-based food' });
+      }
+      if (requestedQty > 2) {
+        return res.status(400).json({ message: 'Regular users can claim maximum 2 plates per order' });
+      }
+      // Check daily limit (3 orders per day)
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const todayClaims = await FoodListing.countDocuments({
+        claimedBy: req.user.id,
+        updatedAt: { $gte: today },
+        status: { $in: ['claimed', 'completed', 'pending_restaurant_approval', 'pending_payment'] }
+      });
+      if (todayClaims >= 3) {
+        return res.status(400).json({ message: 'Regular users can only claim 3 meals per day' });
+      }
+    }
+
+    // Deduct quantity
+    food.remainingQuantity -= requestedQty;
+    food.claimedQuantity = requestedQty;
+
+    if (food.type === 'paid') {
+      food.status = 'pending_payment';
+    } else {
+      food.status = 'pending_restaurant_approval';
+    }
+
+    food.claimedBy = req.user.id;
+    await food.save();
+
+    await createNotification({
+      recipient: food.postedBy._id,
+      message: `${req.user.name} claimed ${requestedQty} ${food.quantityUnit} of "${food.title}"`,
+      type: 'new_claim',
+      listingId: food._id,
+    });
+
+    res.json({ message: 'Food claimed successfully!', food });
   } catch (err) {
-    res.status(400).json({ message: err.message });
+    res.status(500).json({ message: err.message });
   }
 };
 

@@ -7,10 +7,17 @@ function Dashboard() {
   const { user, token } = useAuth();
   const navigate = useNavigate();
   const [form, setForm] = useState({
-    title: '', description: '', quantity: '',
-    expiryTime: '', type: 'free', price: 0,
-    address: '', phone: '', contactEmail: '',
-  });
+  title: '',
+  description: '',
+  quantityNumber: '',
+  quantityUnit: 'plates',
+  expiryTime: '',
+  type: 'free',
+  price: 0,
+  address: '',
+  phone: '',
+  contactEmail: '',
+});
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -119,11 +126,30 @@ function Dashboard() {
                     name="description" placeholder="Describe the food, portion size, freshness..."
                     value={form.description} onChange={handleChange} />
                 </div>
+                {/* Quantity */}
                 <div style={styles.field}>
                   <label style={styles.label}>Quantity *</label>
-                  <input style={styles.input} type="text" name="quantity"
-                    placeholder="e.g. 10 plates, 5 kg"
-                    value={form.quantity} onChange={handleChange} required />
+                  <div style={{ display: 'flex', gap: '10px' }}>
+                    <input
+                      style={{ ...styles.input, flex: 1 }}
+                      type="number"
+                      name="quantityNumber"
+                      placeholder="e.g. 50"
+                      value={form.quantityNumber}
+                      onChange={handleChange}
+                      min="1"
+                      required
+                    />
+                    <select
+                      style={{ ...styles.input, width: '120px' }}
+                      name="quantityUnit"
+                      value={form.quantityUnit}
+                      onChange={handleChange}
+                    >
+                      <option value="plates">Plates</option>
+                      <option value="kg">Kg</option>
+                    </select>
+                  </div>
                 </div>
                 <div style={styles.field}>
                   <label style={styles.label}>Expiry Date & Time *</label>

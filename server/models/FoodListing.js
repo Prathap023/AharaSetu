@@ -41,6 +41,12 @@ const foodSchema = new mongoose.Schema({
   restaurantApproved: { type: Boolean, default: false },
   restaurantRejected: { type: Boolean, default: false },
 
+  // Partial claim fields
+  quantityUnit: { type: String, enum: ['plates', 'kg'], default: 'plates' },
+  quantityNumber: { type: Number, default: 0 },
+  remainingQuantity: { type: Number, default: 0 },
+  claimedQuantity: { type: Number, default: 0 },
+
   // ✅ NEW: Acknowledgement fields
   restaurantProvided: { type: Boolean, default: false },
   volunteerPickedUp: { type: Boolean, default: false },
