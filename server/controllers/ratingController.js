@@ -52,23 +52,26 @@ exports.getMyRating = async (req, res) => {
 // Get all ratings for a restaurant (for My Listings page)
 exports.getRestaurantRatings = async (req, res) => {
   try {
-    const ratings = await Rating.find({
-      restaurant: req.params.restaurantId,
-    })
-      .populate("volunteer", "name")
-      .populate("foodListing");
+    const restaurantId = req.params.restaurantId;
 
-    res.status(200).json({
-      success: true,
-      ratings,
-    });
-  } catch (error) {
-    console.error("Fetch ratings error:", error);
+    // Validate ID before querying
+    if (!restaurantId || restaurantId === 'undefined') {
+      return res.status(400).json({ message: 'Invalid restaurant ID' });
+    }
 
-    res.status(500).json({
-      success: false,
-      message: "Failed to fetch ratings",
-    });
+    const ratings = await Rating.find({ restaurant: restaurantId })
+      .populate('volunteer', 'name')
+      .populate('foodListing', 'title')
+      .sort({ createdAt: -1 });
+
+    const avg = ratings.length
+      ? (ratings.reduce((sum, r) => sum + r.stars, 0) / ratings.length).toFixed(1)
+      : null;
+
+    res.json({ ratings, average: avg, total: ratings.length });
+  } catch (err) {
+    console.error('getRestaurantRatings error:', err);
+    res.status(500).json({ message: err.message });
   }
 };
 
@@ -76,10 +79,18 @@ exports.getRestaurantRatings = async (req, res) => {
 // Get average rating for a restaurant (for Home page)
 exports.getRestaurantAverage = async (req, res) => {
   try {
-    const ratings = await Rating.find({ restaurant: req.params.restaurantId });
+    const restaurantId = req.params.restaurantId;
+
+    // Validate ID before querying
+    if (!restaurantId || restaurantId === 'undefined') {
+      return res.json({ average: null, total: 0 });
+    }
+
+    const ratings = await Rating.find({ restaurant: restaurantId });
     const avg = ratings.length
       ? (ratings.reduce((sum, r) => sum + r.stars, 0) / ratings.length).toFixed(1)
       : null;
+
     res.json({ average: avg, total: ratings.length });
   } catch (err) {
     res.status(500).json({ message: err.message });

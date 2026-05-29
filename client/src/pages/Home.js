@@ -270,8 +270,14 @@ function FoodBrowsePage({ user, token, navigate }) {
     const r = {};
     await Promise.all(listings.map(async (item) => {
       try {
-        const res = await axios.get(`${API}/api/ratings/average/${item.postedBy._id}`);
-        r[item.postedBy._id] = res.data;
+        // Only fetch if postedBy._id exists
+        const restaurantId = item.postedBy?._id || item.postedBy;
+        if (!restaurantId) return;
+
+        const res = await axios.get(
+          `${API}/api/ratings/average/${restaurantId}`
+        );
+        r[restaurantId] = res.data;
       } catch (err) {}
     }));
     setRatings(r);
