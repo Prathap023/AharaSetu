@@ -53,12 +53,11 @@ exports.createListing = async (req, res) => {
 // Get all admin approved listings
 exports.getAllListings = async (req, res) => {
   try {
-    const food = await FoodListing.find({
-      adminApproved: true,
-      adminRejected: false,
-      status: 'available'
-    }).populate('postedBy', 'name email phone');
-    res.json(food);
+    const listings = await FoodListing.find()
+      .populate('postedBy', 'name email phone')
+      .populate('claimedBy', 'name email phone')
+      .sort({ createdAt: -1 });
+    res.json(listings);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -178,7 +177,7 @@ exports.claimListing = async (req, res) => {
     food.claimedBy = req.user.id;
 
     // Calculate total price for payment
-    food.price = totalPrice;
+    food.price = food.pricePerUnit * requestedQty;
 
     // Keep listing LIVE if remaining > 0, otherwise mark as claimed
     if (food.type === 'paid') {
@@ -386,9 +385,10 @@ exports.restaurantReject = async (req, res) => {
 // Get restaurant's own listings
 exports.getMyListings = async (req, res) => {
   try {
-    const food = await FoodListing.find({ postedBy: req.user.id })
-      .populate('claimedBy', 'name email phone');
-    res.json(food);
+    const listings = await FoodListing.find({ postedBy: req.user.id })
+      .populate('claimedBy', 'name email phone')
+      .sort({ createdAt: -1 });
+    res.json(listings);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -397,9 +397,10 @@ exports.getMyListings = async (req, res) => {
 // Get volunteer's claimed listings
 exports.getMyClaimedListings = async (req, res) => {
   try {
-    const food = await FoodListing.find({ claimedBy: req.user.id })
-      .populate('postedBy', 'name email phone address');
-    res.json(food);
+    const listings = await FoodListing.find({ claimedBy: req.user.id })
+      .populate('postedBy', 'name email phone')
+      .sort({ createdAt: -1 });
+    res.json(listings);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

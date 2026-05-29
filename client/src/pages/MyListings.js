@@ -266,7 +266,6 @@ function MyListings() {
                     {/* Claimer Info */}
                     {item.claimedBy && (
                       <div style={styles.claimerBox}>
-                        <span style={styles.claimerTag}>Claimed by</span>
                         <div style={styles.claimerAvatar}>
                           {item.claimedBy.name?.charAt(0).toUpperCase()}
                         </div>
@@ -276,7 +275,15 @@ function MyListings() {
                           {item.claimedBy.phone && (
                             <span style={styles.claimerEmail}>{item.claimedBy.phone}</span>
                           )}
+                          <span style={{
+                            ...styles.claimerEmail,
+                            color: '#FF5200', fontWeight: '600', marginTop: '4px'
+                          }}>
+                            Claimed: {item.claimedQuantity} {item.quantityUnit || 'plates'}
+                            {item.type === 'paid' && ` — Total: ₹${item.price}`}
+                          </span>
                         </div>
+                        <span style={styles.claimerTag}>Claimed by</span>
                       </div>
                     )}
 

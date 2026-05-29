@@ -165,20 +165,20 @@ function MyClaims() {
                   </div>
 
                   {/* Details */}
-                  <div style={styles.detailsBox}>
-                    <div style={styles.detailItem}>
-                      <span style={styles.detailIcon}>📦</span>
-                      <span style={styles.detailText}>{item.quantity}</span>
-                    </div>
-                    <div style={styles.detailItem}>
-                      <span style={styles.detailIcon}>💰</span>
-                      <span style={styles.detailText}>{item.type === 'free' ? 'Free' : `₹${item.price}`}</span>
-                    </div>
+                    <div style={styles.detailsBox}>
+                    <span style={styles.chip}>
+                      Claimed: {item.claimedQuantity} {item.quantityUnit || 'plates'}
+                    </span>
+                    <span style={styles.chip}>
+                      Total available: {item.quantityNumber} {item.quantityUnit || 'plates'}
+                    </span>
+                    <span style={styles.chip}>
+                      {item.type === 'free' ? 'Free' : `₹${item.price}`}
+                    </span>
                     {item.paymentDone && (
-                      <div style={styles.detailItem}>
-                        <span style={styles.detailIcon}>✅</span>
-                        <span style={styles.detailText}>Payment confirmed</span>
-                      </div>
+                      <span style={{ ...styles.chip, color: '#16A34A', background: '#F0FDF4', border: '1px solid #BBF7D0' }}>
+                        Payment confirmed
+                      </span>
                     )}
                   </div>
 

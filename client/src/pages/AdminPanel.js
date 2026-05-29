@@ -251,13 +251,24 @@ function AdminPanel() {
                       <span style={styles.infoSub}>{item.phone}</span>
                     </div>
                     {item.claimedBy && (
-                      <div style={{ ...styles.infoRow, marginTop: '8px', paddingTop: '8px', borderTop: '1px solid #F3F4F6' }}>
-                        <span style={styles.claimedTag}>Claimed by</span>
+                      <div style={{
+                        ...styles.infoRow,
+                        marginTop: '8px', paddingTop: '8px',
+                        borderTop: '1px solid #F3F4F6'
+                      }}>
                         <span style={styles.infoIcon}>👤</span>
                         <div style={styles.infoContent}>
                           <span style={styles.infoName}>{item.claimedBy?.name}</span>
                           <span style={styles.infoSub}>{item.claimedBy?.email}</span>
+                          <span style={{
+                            fontSize: '0.78rem', fontWeight: '600',
+                            color: '#FF5200', marginTop: '2px'
+                          }}>
+                            Claimed: {item.claimedQuantity} {item.quantityUnit || 'plates'}
+                            {item.type === 'paid' && ` @ ₹${item.pricePerUnit}/unit = ₹${item.price}`}
+                          </span>
                         </div>
+                        <span style={styles.claimedTag}>Claimed by</span>
                       </div>
                     )}
                   </div>
