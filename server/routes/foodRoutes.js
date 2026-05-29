@@ -7,7 +7,7 @@ const {
   getAdminListings,
   adminApproveListing,
   adminRejectListing,
-  claimListing,
+  claimFood,
   makePayment,
   restaurantApprove,
   restaurantReject,
@@ -15,7 +15,8 @@ const {
   getMyClaimedListings,
   restaurantProvided,
   volunteerPickedUp,
-  adminComplete
+  adminComplete,
+  getPaymentIntent,
 } = require('../controllers/foodController');
 
 // Public
@@ -29,10 +30,10 @@ router.put('/reject-claim/:id', protect, restaurantReject);
 router.put('/restaurant-provided/:id', protect, restaurantProvided);
 
 // Volunteer/NGO
-router.put('/claim/:id', protect, claimListing);
+router.put('/claim/:id', protect, claimFood);
 router.put('/pay/:id', protect, makePayment);
 router.get('/my-claims', protect, getMyClaimedListings);
-router.get('/get-payment-intent/:id', protect, require('../controllers/foodController').getPaymentIntent);
+router.get('/get-payment-intent/:id', protect, getPaymentIntent);
 router.put('/volunteer-pickedup/:id', protect, volunteerPickedUp);
 
 // Admin

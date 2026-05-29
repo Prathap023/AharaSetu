@@ -53,7 +53,11 @@ exports.createListing = async (req, res) => {
 // Get all admin approved listings
 exports.getAllListings = async (req, res) => {
   try {
-    const listings = await FoodListing.find()
+    const listings = await FoodListing.find({
+      adminApproved: true,
+      adminRejected: false,
+      status: 'available',
+    })
       .populate('postedBy', 'name email phone')
       .populate('claimedBy', 'name email phone')
       .sort({ createdAt: -1 });
@@ -66,9 +70,12 @@ exports.getAllListings = async (req, res) => {
 // Get all listings for admin
 exports.getAdminListings = async (req, res) => {
   try {
-    const food = await FoodListing.find()
+    const food = await FoodListing.find({
+      parentListing: null // only show original listings not auto-created remainders
+    })
       .populate('postedBy', 'name email phone')
-      .populate('claimedBy', 'name email phone');
+      .populate('claimedBy', 'name email phone')
+      .sort({ createdAt: -1 });
     res.json(food);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -108,16 +115,17 @@ exports.adminApproveListing = async (req, res) => {
 // Admin reject listing
 exports.adminRejectListing = async (req, res) => {
   try {
-    const food = await FoodListing.findByIdAndUpdate(
-      req.params.id,
-      { adminRejected: true, adminApproved: false },
-      { new: true }
-    );
+    const food = await FoodListing.findById(req.params.id);
+    if (!food) return res.status(404).json({ message: 'Listing not found' });
 
-    // Notify restaurant
+    food.adminRejected = true;
+    food.adminApproved = false;
+    food.rejectionReason = req.body.reason || 'Rejected by admin';
+    await food.save();
+
     await createNotification({
       recipient: food.postedBy,
-      message: `❌ Your food listing "${food.title}" has been rejected by admin. Please contact admin for more details.`,
+      message: `Your listing "${food.title}" was rejected. Reason: ${food.rejectionReason}`,
       type: 'listing_rejected',
       listingId: food._id
     });
