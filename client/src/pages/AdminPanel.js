@@ -222,11 +222,19 @@ function AdminPanel() {
 
                   {/* Details */}
                   <div style={styles.detailsBox}>
-                    <span style={styles.chip}>📦 {item.quantity}</span>
-                    <span style={styles.chip}>{item.type === 'free' ? '🆓 Free' : `💰 ₹${item.price}`}</span>
-                    <span style={styles.chip}>⏰ {new Date(item.expiryTime).toLocaleDateString()}</span>
+                    <span style={styles.chip}>
+                      Total: {item.quantityNumber} {item.quantityUnit || 'plates'}
+                    </span>
+                    <span style={styles.chip}>
+                      Remaining: {item.remainingQuantity} {item.quantityUnit || 'plates'}
+                    </span>
+                    <span style={styles.chip}>
+                      {item.type === 'free' ? 'Free' : `₹${item.pricePerUnit}/${item.quantityUnit === 'kg' ? 'kg' : 'plate'}`}
+                    </span>
+                    <span style={styles.chip}>
+                      Expires {new Date(item.expiryTime).toLocaleDateString()}
+                    </span>
                   </div>
-
                   {/* Listing ID */}
                   <div style={styles.idBox}>
                     <span style={styles.idLabel}>ID</span>

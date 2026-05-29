@@ -129,7 +129,7 @@ exports.adminRejectListing = async (req, res) => {
 };
 
 // Claim listing (volunteer/NGO)
-exports.claimListing = async (req, res) => {
+exports.claimFood = async (req, res) => {
   try {
     const food = await FoodListing.findById(req.params.id)
       .populate('postedBy', 'name email');
@@ -154,7 +154,6 @@ exports.claimListing = async (req, res) => {
       if (requestedQty > 2) {
         return res.status(400).json({ message: 'Regular users can claim maximum 2 plates per order' });
       }
-      // Check daily limit
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       const todayClaims = await FoodListing.countDocuments({
@@ -167,19 +166,16 @@ exports.claimListing = async (req, res) => {
     }
 
     // Calculate total price for this claim
-    const totalPrice = food.type === 'paid'
-      ? food.pricePerUnit * requestedQty
-      : 0;
+    const pricePerUnit = food.pricePerUnit || 0;
+    const totalPrice = food.type === 'paid' ? pricePerUnit * requestedQty : 0;
 
-    // Deduct from remaining quantity
+    // ✅ Just update the existing listing — NO duplicate creation
     food.remainingQuantity -= requestedQty;
     food.claimedQuantity = requestedQty;
     food.claimedBy = req.user.id;
+    food.price = totalPrice;
 
-    // Calculate total price for payment
-    food.price = food.pricePerUnit * requestedQty;
-
-    // Keep listing LIVE if remaining > 0, otherwise mark as claimed
+    // Set status based on type
     if (food.type === 'paid') {
       food.status = 'pending_payment';
     } else {
@@ -188,10 +184,10 @@ exports.claimListing = async (req, res) => {
 
     await food.save();
 
-    // If remaining quantity > 0 — create a new duplicate listing
-    // with the remaining quantity so others can still claim
+    // ✅ If remaining > 0 — create a SEPARATE listing document
+    // only for remaining so others can claim it independently
     if (food.remainingQuantity > 0) {
-      await FoodListing.create({
+      const newListing = new FoodListing({
         title: food.title,
         description: food.description,
         quantity: `${food.remainingQuantity} ${food.quantityUnit}`,
@@ -206,9 +202,12 @@ exports.claimListing = async (req, res) => {
         phone: food.phone,
         contactEmail: food.contactEmail,
         postedBy: food.postedBy._id,
-        adminApproved: true, // auto-approved since original was approved
+        adminApproved: true,
+        adminRejected: false,
         status: 'available',
+        parentListing: food._id, // reference to original
       });
+      await newListing.save();
     }
 
     await createNotification({
@@ -220,6 +219,7 @@ exports.claimListing = async (req, res) => {
 
     res.json({ message: 'Food claimed!', food, totalPrice });
   } catch (err) {
+    console.error('claimFood error:', err);
     res.status(500).json({ message: err.message });
   }
 };
@@ -385,7 +385,10 @@ exports.restaurantReject = async (req, res) => {
 // Get restaurant's own listings
 exports.getMyListings = async (req, res) => {
   try {
-    const listings = await FoodListing.find({ postedBy: req.user.id })
+    const listings = await FoodListing.find({
+      postedBy: req.user.id,
+      parentListing: null // ✅ only show original listings
+    })
       .populate('claimedBy', 'name email phone')
       .sort({ createdAt: -1 });
     res.json(listings);

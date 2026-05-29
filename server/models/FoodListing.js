@@ -48,6 +48,8 @@ quantityUnit: { type: String, enum: ['plates', 'kg'], default: 'plates' },
 remainingQuantity: { type: Number, default: 0 },  // remaining after claims
 claimedQuantity: { type: Number, default: 0 },    // quantity this claimer took
 
+parentListing: { type: mongoose.Schema.Types.ObjectId, ref: 'FoodListing', default: null },
+
   // ✅ NEW: Acknowledgement fields
   restaurantProvided: { type: Boolean, default: false },
   volunteerPickedUp: { type: Boolean, default: false },
