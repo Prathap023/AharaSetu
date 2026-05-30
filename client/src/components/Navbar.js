@@ -31,14 +31,16 @@ function Navbar() {
         { to: '/about', label: 'About' },
         { to: '/contact', label: 'Contact' },
       ]
-    : user
-    ? [
+      : user
+      ? [
         { to: '/', label: 'Browse Food' },
         { to: '/my-claims', label: 'My Claims' },
+        { to: '/about', label: 'About' },
         { to: '/contact', label: 'Contact' },
       ]
     : [
         { to: '/', label: 'Home' },
+        { to: '/about', label: 'About' },
         { to: '/contact', label: 'Contact' },
       ];
 
