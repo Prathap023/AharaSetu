@@ -70,9 +70,7 @@ exports.getAllListings = async (req, res) => {
 // Get all listings for admin
 exports.getAdminListings = async (req, res) => {
   try {
-    const food = await FoodListing.find({
-      parentListing: null // only show original listings not auto-created remainders
-    })
+    const food = await FoodListing.find()
       .populate('postedBy', 'name email phone')
       .populate('claimedBy', 'name email phone')
       .sort({ createdAt: -1 });
@@ -395,7 +393,6 @@ exports.getMyListings = async (req, res) => {
   try {
     const listings = await FoodListing.find({
       postedBy: req.user.id,
-      parentListing: null // ✅ only show original listings
     })
       .populate('claimedBy', 'name email phone')
       .sort({ createdAt: -1 });
