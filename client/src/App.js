@@ -14,6 +14,7 @@ import ResetPassword from './pages/ResetPassword';
 import VerifyOTP from './pages/VerifyOTP';
 import ContactUs from './pages/ContactUs';
 import ReportIssue from './pages/ReportIssue';
+import PostSuccess from './pages/PostSuccess';
 
 function App() {
   return (
@@ -33,6 +34,7 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
         <Route path="/verify-otp" element={<VerifyOTP />} />
+        <Route path="/post-success" element={<PostSuccess />} />
       </Routes>
     </Router>
   );

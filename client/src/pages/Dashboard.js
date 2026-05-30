@@ -26,19 +26,21 @@ function Dashboard() {
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      await axios.post('https://aharasetu-backend-pov2.onrender.com/api/food', form, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setMessage('success');
-      setForm({ title: '', description: '', quantity: '', expiryTime: '', type: 'free', price: 0, address: '', phone: '', contactEmail: '' });
-    } catch (err) {
-      setMessage('error');
-    }
-    setLoading(false);
-  };
+  e.preventDefault();
+  setLoading(true);
+  try {
+    const res = await axios.post(
+      'https://aharasetu-backend-pov2.onrender.com/api/food',
+      form,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    // Redirect to success page with listing details
+    navigate('/post-success', { state: { listing: res.data } });
+  } catch (err) {
+    setMessage('error');
+  }
+  setLoading(false);
+};
 
   if (user.role !== 'restaurant') {
     return (
