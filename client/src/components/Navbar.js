@@ -102,17 +102,6 @@ function Navbar() {
                 <Link to="/register" style={styles.registerBtn}>Sign Up</Link>
               </div>
             )}
-
-            {/* Hamburger */}
-            <button
-              style={styles.hamburger}
-              onClick={() => setMenuOpen(!menuOpen)}
-              aria-label="Menu"
-            >
-              <div style={{ ...styles.hamLine, ...(menuOpen ? styles.hamLine1Open : {}) }} />
-              <div style={{ ...styles.hamLine, ...(menuOpen ? styles.hamLine2Open : {}) }} />
-              <div style={{ ...styles.hamLine, ...(menuOpen ? styles.hamLine3Open : {}) }} />
-            </button>
           </div>
         </div>
       </nav>
