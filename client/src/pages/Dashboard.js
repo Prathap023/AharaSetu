@@ -55,22 +55,6 @@ function Dashboard() {
             <p style={styles.welcomeText}>
               As a <strong>{user.role}</strong>, you can browse available food listings, claim food, and make a difference in your community.
             </p>
-            <div style={styles.quickLinks}>
-              {[
-                { icon: '🍱', label: 'Browse Food', path: '/' },
-                { icon: '📦', label: 'My Claims', path: '/my-claims' },
-                { icon: '📬', label: 'Contact', path: '/contact' },
-              ].map(link => (
-                <button
-                  key={link.path}
-                  style={styles.quickLink}
-                  onClick={() => navigate(link.path)}
-                >
-                  <span style={styles.quickLinkIcon}>{link.icon}</span>
-                  <span style={styles.quickLinkLabel}>{link.label}</span>
-                </button>
-              ))}
-            </div>
           </div>
         </div>
       </div>
@@ -88,7 +72,7 @@ function Dashboard() {
             <p style={styles.pageSub}>Fill in the details and admin will review your listing</p>
           </div>
           <button style={styles.myListingsBtn} onClick={() => navigate('/my-listings')}>
-            📋 My Listings →
+            <i class="fa-solid fa-warehouse"></i> My Listings →
           </button>
         </div>
 
@@ -114,7 +98,7 @@ function Dashboard() {
 
             {/* Section: Food Details */}
             <div style={styles.formSection}>
-              <h3 style={styles.sectionTitle}>🍛 Food Details</h3>
+              <h3 style={styles.sectionTitle}><i class="fa-solid fa-bowl-rice"></i> Food Details</h3>
               <div style={styles.fieldGrid}>
                 <div style={{ ...styles.field, gridColumn: '1 / -1' }}>
                   <label style={styles.label}>Food Title *</label>
@@ -163,7 +147,7 @@ function Dashboard() {
 
             {/* Section: Pricing */}
             <div style={styles.formSection}>
-              <h3 style={styles.sectionTitle}>💰 Pricing</h3>
+              <h3 style={styles.sectionTitle}><i class="fa-solid fa-sack-dollar"></i> Pricing</h3>
               <div style={styles.typeToggle}>
                 <button
                   type="button"
@@ -173,7 +157,7 @@ function Dashboard() {
                   }}
                   onClick={() => setForm({ ...form, type: 'free', price: 0 })}
                 >
-                  <span style={styles.typeBtnIcon}>🆓</span>
+                  <span style={styles.typeBtnIcon}><i class="fa-solid fa-gift"></i></span>
                   <span style={styles.typeBtnLabel}>Free</span>
                   <span style={styles.typeBtnDesc}>Donate at no cost</span>
                 </button>
@@ -185,7 +169,7 @@ function Dashboard() {
                   }}
                   onClick={() => setForm({ ...form, type: 'paid' })}
                 >
-                  <span style={styles.typeBtnIcon}>💰</span>
+                  <span style={styles.typeBtnIcon}><i class="fa-solid fa-sack-dollar"></i></span>
                   <span style={styles.typeBtnLabel}>Paid</span>
                   <span style={styles.typeBtnDesc}>Set a reduced price</span>
                 </button>
@@ -215,7 +199,7 @@ function Dashboard() {
 
             {/* Section: Contact & Location */}
             <div style={styles.formSection}>
-              <h3 style={styles.sectionTitle}>📍 Location & Contact</h3>
+              <h3 style={styles.sectionTitle}><i class="fa-solid fa-location-dot"></i> Location & Contact</h3>
               <div style={styles.fieldGrid}>
                 <div style={{ ...styles.field, gridColumn: '1 / -1' }}>
                   <label style={styles.label}>Restaurant Address *</label>
@@ -241,13 +225,13 @@ function Dashboard() {
             {/* Submit */}
             <div style={styles.submitRow}>
               <p style={styles.submitNote}>
-                📋 Your listing will be reviewed by admin before going live
+                <i class="fa-solid fa-warehouse"></i> Your listing will be reviewed by admin before going live
               </p>
               <button
                 style={{ ...styles.submitBtn, opacity: loading ? 0.75 : 1 }}
                 type="submit" disabled={loading}
               >
-                {loading ? 'Submitting...' : '🍱 Submit Food Listing'}
+                {loading ? 'Submitting...' : ' Submit Food Listing'}
               </button>
             </div>
 

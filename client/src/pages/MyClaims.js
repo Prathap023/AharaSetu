@@ -189,19 +189,20 @@ function MyClaims() {
                     </div>
                     <div style={styles.restaurantInfo}>
                       <span style={styles.restaurantName}>{item.postedBy?.name}</span>
-                      <span style={styles.restaurantContact}>📞 {item.postedBy?.phone || 'N/A'}</span>
-                      <span style={styles.restaurantContact}>📍 {item.address}</span>
+                      <span style={styles.restaurantContact}><i class="fa-solid fa-phone"></i> {item.phone || 'N/A'}</span>
+                      <span style={styles.restaurantContact}><i class="fa-solid fa-envelope"></i> {item.contactEmail || 'N/A'}</span>
+                      <span style={styles.restaurantContact}><i class="fa-solid fa-map-marker-alt"></i> {item.address}</span>
                     </div>
                     <div style={styles.contactBtns}>
-                      <a href={`tel:${item.postedBy?.phone}`} style={styles.contactBtn}>📞</a>
-                      <a href={`mailto:${item.postedBy?.email}`} style={styles.contactBtn}>✉️</a>
+                      <a href={`tel:${item.phone}`} style={styles.contactBtn}><i class="fa-solid fa-phone"></i></a>
+                      <a href={`mailto:${item.contactEmail}`} style={styles.contactBtn}><i class="fa-solid fa-envelope"></i></a>
                     </div>
                   </div>
 
                   {/* Payment Button */}
                   {item.status === 'pending_payment' && (
                     <button style={styles.payBtn} onClick={() => navigate(`/payment/${item._id}`)}>
-                      💳 Pay Now — ₹{item.price}
+                       Pay Now — ₹{item.price}
                     </button>
                   )}
 

@@ -28,14 +28,12 @@ function Navbar() {
         { to: '/', label: 'Home' },
         { to: '/dashboard', label: 'Post Food' },
         { to: '/my-listings', label: 'My Listings' },
-        { to: '/about', label: 'About' },
         { to: '/contact', label: 'Contact' },
       ]
       : user
       ? [
         { to: '/', label: 'Browse Food' },
         { to: '/my-claims', label: 'My Claims' },
-        { to: '/about', label: 'About' },
         { to: '/contact', label: 'Contact' },
       ]
     : [

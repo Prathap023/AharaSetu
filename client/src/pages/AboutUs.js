@@ -32,7 +32,7 @@ function AboutUs() {
 
   const team = [
     {
-      name: 'Anubhav Singh',
+      name: 'Bhanupratap Reddy',
       role: 'Full Stack Developer',
       desc: 'Built AharaSetu from scratch — backend API, React frontend, payments, emails and deployment.',
     },
@@ -199,7 +199,7 @@ function AboutUs() {
             ))}
           </div>
           <p style={styles.institutionText}>
-            Ramaiah Institute of Technology · Department of MCA · 25MCA26 Full Stack Development · 2025–26
+            Ramaiah Institute of Technology · Department of MCA
           </p>
         </div>
       </div>

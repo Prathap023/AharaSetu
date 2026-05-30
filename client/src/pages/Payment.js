@@ -166,8 +166,17 @@ function CheckoutForm({ food, clientSecret }) {
         type="submit"
         disabled={loading || !stripe}
       >
-        {loading ? '⏳ Processing...' : `💳 Pay ₹${food?.price}`}
-      </button>
+{
+  loading ? (
+    <>
+      <i className="fa-solid fa-hourglass-half"></i> ⏳ Processing...
+    </>
+  ) : (
+    <>
+      <i className="fa-regular fa-credit-card"></i> Pay ₹{food?.price}
+    </>
+  )
+}      </button>
     </form>
   );
 }
@@ -203,7 +212,7 @@ function Payment() {
   };
 
   if (loading) return (
-    <div style={styles.center}><p>⏳ Loading payment details...</p></div>
+    <div style={styles.center}><p><i class="fa-solid fa-hourglass-half"></i> Loading payment details...</p></div>
   );
 
   if (error) return (
@@ -229,7 +238,7 @@ function Payment() {
     <div style={styles.container}>
       <div style={styles.card}>
         <div style={styles.header}>
-          <h2 style={styles.title}>💳 Secure Payment</h2>
+          <h2 style={styles.title}><i class="fa-regular fa-credit-card"></i> Secure Payment</h2>
           <p style={styles.subtitle}>Powered by Stripe</p>
         </div>
 
@@ -255,7 +264,7 @@ function Payment() {
 
         <div style={styles.stripeBox}>
           <span style={styles.stripeLogo}>stripe</span>
-          <span style={styles.secureText}>🔒 Secured by Stripe</span>
+          <span style={styles.secureText}> Secured by Stripe</span>
         </div>
 
         <Elements stripe={stripePromise} options={options}>

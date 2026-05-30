@@ -24,10 +24,10 @@ function Register() {
   };
 
   const roles = [
-    { value: 'user', label: 'Regular User', icon: '👤', desc: 'Browse and claim food' },
-    { value: 'volunteer', label: 'Volunteer', icon: '🤝', desc: 'Help distribute food' },
-    { value: 'ngo', label: 'NGO', icon: '🏢', desc: 'Organize food drives' },
-    { value: 'restaurant', label: 'Restaurant', icon: '🏪', desc: 'Share surplus food' },
+    { value: 'user', label: 'Regular User', icon:<i class="fa-regular fa-user"></i>, desc: 'Browse and claim food' },
+    { value: 'volunteer', label: 'Volunteer', icon: <i class="fa-regular fa-handshake"></i>, desc: 'Help distribute food' },
+    { value: 'ngo', label: 'NGO', icon: <i class="fa-solid fa-building-ngo"></i>, desc: 'Organize food drives' },
+    { value: 'restaurant', label: 'Restaurant', icon: <i class="fa-solid fa-utensils"></i>, desc: 'Share surplus food' },
   ];
 
   return (
@@ -45,10 +45,10 @@ function Register() {
           </p>
           <div style={styles.features}>
             {[
-              { icon: '✅', text: 'Free to join and use' },
-              { icon: '🔒', text: 'Secure OTP verification' },
-              { icon: '⚡', text: 'Real-time notifications' },
-              { icon: '💳', text: 'Safe Stripe payments' },
+              { icon: <i class="fa-solid fa-circle-check"></i>, text: 'Free to join and use' },
+              { icon: <i class="fa-solid fa-lock"></i>, text: 'Secure OTP verification' },
+              { icon: <i class="fa-solid fa-bolt"></i>, text: 'Real-time notifications' },
+              { icon: <i class="fa-solid fa-credit-card"></i>, text: 'Safe Stripe payments' },
             ].map((f, i) => (
               <div key={i} style={styles.feature}>
                 <span style={styles.featureIcon}>{f.icon}</span>
@@ -179,7 +179,7 @@ const styles = {
   feature: { display: 'flex', alignItems: 'center', gap: '12px' },
   featureIcon: {
     width: '32px', height: '32px', borderRadius: '8px',
-    background: 'rgba(255,82,0,0.15)', display: 'flex',
+    background: '#FF5200', display: 'flex',
     alignItems: 'center', justifyContent: 'center', fontSize: '14px', flexShrink: 0,
   },
   featureText: { fontSize: '0.9rem', color: 'rgba(255,255,255,0.7)' },
