@@ -16,6 +16,9 @@ import ContactUs from './pages/ContactUs';
 import ReportIssue from './pages/ReportIssue';
 import PostSuccess from './pages/PostSuccess';
 import Profile from './pages/Profile';
+import AboutUs from './pages/AboutUs';
+
+
 
 function App() {
   return (
@@ -25,6 +28,7 @@ function App() {
         <Route path="/report" element={<ReportIssue />} />
         <Route path="/contact" element={<ContactUs />} />
         <Route path="/" element={<Home />} />
+        <Route path="/about" element={<AboutUs />} />
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
         <Route path="/dashboard" element={<Dashboard />} />

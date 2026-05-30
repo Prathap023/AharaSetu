@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import NotificationBell from './NotificationBell';
@@ -9,18 +9,43 @@ function Navbar() {
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-    setMenuOpen(false);
-  };
+  // Close menu on route change
+  useEffect(() => { setMenuOpen(false); }, [location.pathname]);
 
+  // Prevent body scroll when menu open
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [menuOpen]);
+
+  const handleLogout = () => { logout(); navigate('/login'); };
   const isActive = (path) => location.pathname === path;
+
+  const navLinks = user?.role === 'admin'
+    ? [{ to: '/admin', label: 'Admin Panel' }]
+    : user?.role === 'restaurant'
+    ? [
+        { to: '/', label: 'Home' },
+        { to: '/dashboard', label: 'Post Food' },
+        { to: '/my-listings', label: 'My Listings' },
+        { to: '/about', label: 'About' },
+        { to: '/contact', label: 'Contact' },
+      ]
+    : user
+    ? [
+        { to: '/', label: 'Browse Food' },
+        { to: '/my-claims', label: 'My Claims' },
+        { to: '/contact', label: 'Contact' },
+      ]
+    : [
+        { to: '/', label: 'Home' },
+        { to: '/contact', label: 'Contact' },
+      ];
 
   return (
     <>
       <nav style={styles.nav}>
-        <div style={styles.navInner}>
+        <div style={styles.inner}>
           {/* Brand */}
           <Link to="/" style={styles.brand}>
             <div style={styles.brandIcon}>🍱</div>
@@ -29,88 +54,30 @@ function Navbar() {
 
           {/* Desktop Links */}
           <div style={styles.desktopLinks}>
-            {user ? (
-              <>
-                {user.role === 'admin' && (
-                  <Link to="/admin" style={{
-                    ...styles.navLink,
-                    ...(isActive('/admin') ? styles.navLinkActive : {})
-                  }}>Admin Panel</Link>
-                )}
-                {user.role === 'restaurant' && (
-                  <>
-                    <Link to="/dashboard" style={{
-                      ...styles.navLink,
-                      ...(isActive('/dashboard') ? styles.navLinkActive : {})
-                    }}>Post Food</Link>
-                    <Link to="/my-listings" style={{
-                      ...styles.navLink,
-                      ...(isActive('/my-listings') ? styles.navLinkActive : {})
-                    }}>My Listings</Link>
-                    
-                    <Link to="/contact" style={{
-                      ...styles.navLink,
-                      ...(isActive('/contact') ? styles.navLinkActive : {})
-                    }}>Contact</Link>
-                  </>
-                )}
-                {(user.role === 'volunteer' || user.role === 'ngo' || user.role === 'user') && (
-                  <>
-                    <Link to="/" style={{
-                      ...styles.navLink,
-                      ...(isActive('/') ? styles.navLinkActive : {})
-                    }}>Browse Food</Link>
-                    <Link to="/my-claims" style={{
-                      ...styles.navLink,
-                      ...(isActive('/my-claims') ? styles.navLinkActive : {})
-                    }}>My Claims</Link>
-                    <Link to="/contact" style={{
-                      ...styles.navLink,
-                      ...(isActive('/contact') ? styles.navLinkActive : {})
-                    }}>Contact</Link>
-                    <a
-                      href="https://aharasetu-report.onrender.com/"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{
-                        ...styles.navLink,
-                        ...(isActive('/about') ? styles.navLinkActive : {})
-                      }}
-                    >
-                      What We have done
-                    </a>
-                  </>
-                )}
-              </>
-            ) : (
-              <>
-                <Link to="/" style={styles.navLink}>Browse Food</Link>
-                <Link to="/contact" style={styles.navLink}>Contact</Link>
-                <a
-                      href="https://aharasetu-report.onrender.com/"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{
-                        ...styles.navLink,
-                        ...(isActive('/about') ? styles.navLinkActive : {})
-                      }}
-                    >
-                      What We have done
-                    </a>
-              </>
-            )}
+            {navLinks.map(link => (
+              <Link
+                key={link.to}
+                to={link.to}
+                style={{
+                  ...styles.navLink,
+                  ...(isActive(link.to) ? styles.navLinkActive : {})
+                }}
+              >
+                {link.label}
+              </Link>
+            ))}
           </div>
 
           {/* Right Side */}
-          <div style={styles.rightSide}>
+          <div style={styles.right}>
             {user ? (
               <>
                 <NotificationBell />
                 <div
-                  style={{ ...styles.userChip, cursor: 'pointer' }}
+                  style={styles.userChip}
                   onClick={() => navigate('/profile')}
                 >
-                  <div style={styles.userAvatar}>
+                  <div style={styles.avatar}>
                     {user.name?.charAt(0).toUpperCase()}
                   </div>
                   <div style={styles.userInfo}>
@@ -118,72 +85,87 @@ function Navbar() {
                     <span style={styles.userRole}>{user.role}</span>
                   </div>
                 </div>
-                <button onClick={handleLogout} style={styles.logoutBtn}>
+                {/* Desktop logout */}
+                <button
+                  style={{ ...styles.logoutBtn, display: 'none' }}
+                  className="hide-mobile"
+                  onClick={handleLogout}
+                >
                   Logout
                 </button>
               </>
             ) : (
-              <>
+              <div style={styles.authBtns}>
                 <Link to="/login" style={styles.loginBtn}>Login</Link>
                 <Link to="/register" style={styles.registerBtn}>Sign Up</Link>
-              </>
+              </div>
             )}
 
-            {/* Mobile menu toggle */}
+            {/* Hamburger */}
             <button
-              style={styles.menuToggle}
+              style={styles.hamburger}
               onClick={() => setMenuOpen(!menuOpen)}
+              aria-label="Menu"
             >
-              {menuOpen ? '✕' : '☰'}
+              <div style={{ ...styles.hamLine, ...(menuOpen ? styles.hamLine1Open : {}) }} />
+              <div style={{ ...styles.hamLine, ...(menuOpen ? styles.hamLine2Open : {}) }} />
+              <div style={{ ...styles.hamLine, ...(menuOpen ? styles.hamLine3Open : {}) }} />
             </button>
           </div>
         </div>
       </nav>
 
-      {/* Mobile Menu */}
+      {/* Mobile Menu Overlay */}
       {menuOpen && (
-        <div style={styles.mobileMenu}>
-          {user ? (
-            <>
-              <div style={styles.mobileUser}>
-                <div style={styles.mobileUserAvatar}>
-                  {user.name?.charAt(0).toUpperCase()}
-                </div>
-                <div>
-                  <div style={styles.mobileUserName}>{user.name}</div>
-                  <div style={styles.mobileUserRole}>{user.role}</div>
-                </div>
-              </div>
-              {user.role === 'admin' && (
-                <Link to="/admin" style={styles.mobileLink} onClick={() => setMenuOpen(false)}>🛡️ Admin Panel</Link>
-              )}
-              {user.role === 'restaurant' && (
-                <>
-                  <Link to="/dashboard" style={styles.mobileLink} onClick={() => setMenuOpen(false)}>🍛 Post Food</Link>
-                  <Link to="/my-listings" style={styles.mobileLink} onClick={() => setMenuOpen(false)}>📋 My Listings</Link>
-                  <Link to="/contact" style={styles.mobileLink} onClick={() => setMenuOpen(false)}>📬 Contact</Link>
-                  <Link to="https://aharasetu-report.onrender.com/" style={styles.mobileLink} onClick={() => setMenuOpen(false)}>What We Have Done</Link>
-                </>
-              )}
-              {(user.role === 'volunteer' || user.role === 'ngo' || user.role === 'user') && (
-                <>
-                  <Link to="/" style={styles.mobileLink} onClick={() => setMenuOpen(false)}>🍱 Browse Food</Link>
-                  <Link to="/my-claims" style={styles.mobileLink} onClick={() => setMenuOpen(false)}>📦 My Claims</Link>
-                  <Link to="/contact" style={styles.mobileLink} onClick={() => setMenuOpen(false)}>📬 Contact</Link>
-                </>
-              )}
-              <button onClick={handleLogout} style={styles.mobileLogout}>Logout</button>
-            </>
-          ) : (
-            <>
-              <Link to="/" style={styles.mobileLink} onClick={() => setMenuOpen(false)}>🍱 Browse Food</Link>
-              <Link to="/contact" style={styles.mobileLink} onClick={() => setMenuOpen(false)}>📬 Contact</Link>
-              <Link to="/login" style={styles.mobileLink} onClick={() => setMenuOpen(false)}>Login</Link>
-              <Link to="/register" style={styles.mobileRegister} onClick={() => setMenuOpen(false)}>Sign Up</Link>
-            </>
+        <div style={styles.overlay} onClick={() => setMenuOpen(false)} />
+      )}
+
+      {/* Mobile Menu Drawer */}
+      <div style={{
+        ...styles.drawer,
+        transform: menuOpen ? 'translateX(0)' : 'translateX(100%)',
+      }}>
+        {user && (
+          <div style={styles.drawerUser}>
+            <div style={styles.drawerAvatar}>
+              {user.name?.charAt(0).toUpperCase()}
+            </div>
+            <div>
+              <p style={styles.drawerName}>{user.name}</p>
+              <p style={styles.drawerRole}>{user.role}</p>
+            </div>
+          </div>
+        )}
+
+        <div style={styles.drawerLinks}>
+          {navLinks.map(link => (
+            <Link
+              key={link.to}
+              to={link.to}
+              style={{
+                ...styles.drawerLink,
+                ...(isActive(link.to) ? styles.drawerLinkActive : {})
+              }}
+            >
+              {link.label}
+            </Link>
+          ))}
+          {user && (
+            <Link to="/profile" style={styles.drawerLink}>Profile</Link>
           )}
         </div>
-      )}
+
+        {user ? (
+          <button style={styles.drawerLogout} onClick={handleLogout}>
+            Sign Out
+          </button>
+        ) : (
+          <div style={styles.drawerAuth}>
+            <Link to="/login" style={styles.drawerLoginBtn}>Login</Link>
+            <Link to="/register" style={styles.drawerRegisterBtn}>Sign Up</Link>
+          </div>
+        )}
+      </div>
     </>
   );
 }
@@ -191,128 +173,163 @@ function Navbar() {
 const styles = {
   nav: {
     position: 'fixed', top: 0, left: 0, right: 0, zIndex: 1000,
-    background: '#FFFFFF',
-    borderBottom: '1px solid #F0F0F0',
-    boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
-    height: '64px',
+    background: 'rgba(255,255,255,0.97)',
+    backdropFilter: 'blur(12px)',
+    borderBottom: '1px solid #E5E7EB',
+    height: '58px',
+    boxShadow: '0 1px 12px rgba(0,0,0,0.06)',
   },
-  navInner: {
+  inner: {
     maxWidth: '1200px', margin: '0 auto',
-    padding: '0 24px', height: '100%',
+    padding: '0 20px', height: '100%',
     display: 'flex', alignItems: 'center',
-    justifyContent: 'space-between', gap: '24px',
+    justifyContent: 'space-between', gap: '16px',
   },
   brand: {
-    display: 'flex', alignItems: 'center', gap: '10px',
+    display: 'flex', alignItems: 'center', gap: '8px',
     textDecoration: 'none', flexShrink: 0,
   },
   brandIcon: {
-    width: '36px', height: '36px', borderRadius: '10px',
+    width: '32px', height: '32px', borderRadius: '9px',
     background: 'linear-gradient(135deg, #FF5200, #FF8C00)',
     display: 'flex', alignItems: 'center', justifyContent: 'center',
-    fontSize: '18px', boxShadow: '0 2px 8px rgba(255,82,0,0.3)',
+    fontSize: '16px',
   },
   brandText: {
-    fontSize: '1.15rem', fontWeight: '700',
+    fontSize: '1.05rem', fontWeight: '800',
     color: '#1C1C1C', letterSpacing: '-0.02em',
   },
   desktopLinks: {
-    display: 'flex', alignItems: 'center', gap: '4px', flex: 1,
+    display: 'flex', alignItems: 'center', gap: '2px', flex: 1,
     '@media (max-width: 768px)': { display: 'none' },
   },
   navLink: {
-    padding: '7px 14px', borderRadius: '8px',
-    fontSize: '0.88rem', fontWeight: '500',
-    color: '#6B6B6B', textDecoration: 'none',
+    padding: '6px 12px', borderRadius: '7px',
+    fontSize: '0.85rem', fontWeight: '500',
+    color: '#6B7280', textDecoration: 'none',
     transition: 'all 0.15s',
-    ':hover': { color: '#FF5200', background: '#FFF0EB' },
+    whiteSpace: 'nowrap',
   },
-  navLinkActive: {
-    color: '#FF5200', background: '#FFF0EB', fontWeight: '600',
-  },
-  rightSide: {
-    display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0,
-  },
+  navLinkActive: { color: '#FF5200', background: '#FFF0EB', fontWeight: '600' },
+  right: { display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 },
   userChip: {
-    display: 'flex', alignItems: 'center', gap: '8px',
-    padding: '5px 12px 5px 6px',
+    display: 'flex', alignItems: 'center', gap: '7px',
+    padding: '4px 10px 4px 5px',
     background: '#F9FAFB', border: '1px solid #E5E7EB',
-    borderRadius: '100px',
+    borderRadius: '100px', cursor: 'pointer',
   },
-  userAvatar: {
-    width: '28px', height: '28px', borderRadius: '50%',
+  avatar: {
+    width: '26px', height: '26px', borderRadius: '50%',
     background: 'linear-gradient(135deg, #FF5200, #FF8C00)',
-    color: 'white', fontSize: '0.8rem', fontWeight: '700',
+    color: 'white', fontSize: '0.75rem', fontWeight: '700',
     display: 'flex', alignItems: 'center', justifyContent: 'center',
   },
   userInfo: { display: 'flex', flexDirection: 'column' },
-  userName: { fontSize: '0.8rem', fontWeight: '600', color: '#1C1C1C', lineHeight: 1.2 },
-  userRole: { fontSize: '0.68rem', color: '#9CA3AF', textTransform: 'capitalize', lineHeight: 1.2 },
+  userName: { fontSize: '0.76rem', fontWeight: '600', color: '#1C1C1C', lineHeight: 1.2 },
+  userRole: { fontSize: '0.62rem', color: '#9CA3AF', textTransform: 'capitalize', lineHeight: 1.2 },
   logoutBtn: {
-    padding: '7px 16px', borderRadius: '8px',
+    padding: '6px 14px', borderRadius: '7px',
     background: 'transparent', border: '1px solid #E5E7EB',
-    fontSize: '0.84rem', fontWeight: '500', color: '#6B6B6B',
-    cursor: 'pointer', transition: 'all 0.15s',
+    fontSize: '0.82rem', fontWeight: '500', color: '#6B7280', cursor: 'pointer',
   },
-  loginBtn: {
-    padding: '7px 16px', borderRadius: '8px',
-    fontSize: '0.88rem', fontWeight: '500',
-    color: '#1C1C1C', textDecoration: 'none',
-  },
+  authBtns: { display: 'flex', gap: '6px', alignItems: 'center' },
+  loginBtn: { padding: '6px 14px', fontSize: '0.85rem', fontWeight: '500', color: '#1C1C1C' },
   registerBtn: {
-    padding: '7px 18px', borderRadius: '8px',
+    padding: '6px 14px', borderRadius: '7px',
     background: '#FF5200', color: 'white',
-    fontSize: '0.88rem', fontWeight: '600',
-    textDecoration: 'none',
-    boxShadow: '0 2px 8px rgba(255,82,0,0.3)',
+    fontSize: '0.85rem', fontWeight: '600',
   },
-  menuToggle: {
-    display: 'none',
-    background: 'none', border: 'none',
-    fontSize: '1.2rem', cursor: 'pointer',
-    padding: '4px', color: '#1C1C1C',
-    '@media (max-width: 768px)': { display: 'block' },
+  hamburger: {
+    width: '36px', height: '36px',
+    display: 'flex', flexDirection: 'column',
+    alignItems: 'center', justifyContent: 'center',
+    gap: '5px', background: 'none', border: 'none',
+    cursor: 'pointer', padding: '4px', flexShrink: 0,
   },
-  mobileMenu: {
-    position: 'fixed', top: '64px', left: 0, right: 0, zIndex: 999,
-    background: 'white', borderBottom: '1px solid #F0F0F0',
-    padding: '16px 24px 24px',
-    boxShadow: '0 8px 24px rgba(0,0,0,0.1)',
-    display: 'flex', flexDirection: 'column', gap: '4px',
+  hamLine: {
+    width: '20px', height: '2px',
+    background: '#1C1C1C', borderRadius: '2px',
+    transition: 'all 0.25s ease',
+    transformOrigin: 'center',
   },
-  mobileUser: {
+  hamLine1Open: { transform: 'translateY(7px) rotate(45deg)' },
+  hamLine2Open: { opacity: 0, transform: 'scaleX(0)' },
+  hamLine3Open: { transform: 'translateY(-7px) rotate(-45deg)' },
+  overlay: {
+    position: 'fixed', inset: 0, zIndex: 1001,
+    background: 'rgba(0,0,0,0.4)',
+    backdropFilter: 'blur(2px)',
+  },
+  drawer: {
+    position: 'fixed', top: 0, right: 0, bottom: 0, zIndex: 1002,
+    width: 'min(300px, 85vw)',
+    background: 'white',
+    boxShadow: '-4px 0 24px rgba(0,0,0,0.12)',
+    padding: '24px 20px',
+    display: 'flex', flexDirection: 'column',
+    transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+    overflowY: 'auto',
+    paddingTop: '70px',
+  },
+  drawerUser: {
     display: 'flex', alignItems: 'center', gap: '12px',
-    padding: '12px 0 16px',
-    borderBottom: '1px solid #F0F0F0', marginBottom: '8px',
+    padding: '0 0 18px',
+    borderBottom: '1px solid #F3F4F6',
+    marginBottom: '12px',
   },
-  mobileUserAvatar: {
-    width: '40px', height: '40px', borderRadius: '50%',
+  drawerAvatar: {
+    width: '44px', height: '44px', borderRadius: '12px',
     background: 'linear-gradient(135deg, #FF5200, #FF8C00)',
-    color: 'white', fontSize: '1rem', fontWeight: '700',
+    color: 'white', fontSize: '1.1rem', fontWeight: '700',
     display: 'flex', alignItems: 'center', justifyContent: 'center',
+    flexShrink: 0,
   },
-  mobileUserName: { fontSize: '0.95rem', fontWeight: '600', color: '#1C1C1C' },
-  mobileUserRole: { fontSize: '0.78rem', color: '#9CA3AF', textTransform: 'capitalize' },
-  mobileLink: {
-    padding: '11px 12px', borderRadius: '8px',
+  drawerName: { fontSize: '0.92rem', fontWeight: '700', color: '#1C1C1C' },
+  drawerRole: { fontSize: '0.74rem', color: '#9CA3AF', textTransform: 'capitalize' },
+  drawerLinks: { display: 'flex', flexDirection: 'column', gap: '2px', flex: 1 },
+  drawerLink: {
+    padding: '12px 14px', borderRadius: '9px',
     fontSize: '0.92rem', fontWeight: '500',
     color: '#2D2D2D', textDecoration: 'none',
-    display: 'block', transition: 'background 0.15s',
+    display: 'block',
   },
-  mobileLogout: {
-    marginTop: '8px', padding: '11px 12px',
-    borderRadius: '8px', background: '#FFF0EB',
-    border: 'none', color: '#FF5200',
-    fontSize: '0.92rem', fontWeight: '600',
+  drawerLinkActive: { color: '#FF5200', background: '#FFF0EB', fontWeight: '600' },
+  drawerLogout: {
+    marginTop: '16px', padding: '12px',
+    borderRadius: '9px', background: '#FEF2F2',
+    border: 'none', color: '#DC2626',
+    fontSize: '0.9rem', fontWeight: '600',
     cursor: 'pointer', textAlign: 'left',
   },
-  mobileRegister: {
-    marginTop: '8px', padding: '12px',
-    borderRadius: '10px', background: '#FF5200',
-    color: 'white', fontSize: '0.92rem',
-    fontWeight: '600', textAlign: 'center',
-    display: 'block', textDecoration: 'none',
+  drawerAuth: { display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '16px' },
+  drawerLoginBtn: {
+    padding: '12px', borderRadius: '9px',
+    border: '1.5px solid #E5E7EB',
+    fontSize: '0.9rem', fontWeight: '600',
+    color: '#374151', textAlign: 'center',
+    display: 'block',
+  },
+  drawerRegisterBtn: {
+    padding: '12px', borderRadius: '9px',
+    background: '#FF5200', color: 'white',
+    fontSize: '0.9rem', fontWeight: '600',
+    textAlign: 'center', display: 'block',
   },
 };
+
+// Hide desktop links on mobile using JS
+if (typeof window !== 'undefined') {
+  const style = document.createElement('style');
+  style.innerHTML = `
+    @media (max-width: 768px) {
+      .desktop-links { display: none !important; }
+      .user-chip-name { display: none !important; }
+    }
+    @media (min-width: 769px) {
+      .hamburger { display: none !important; }
+    }
+  `;
+  document.head.appendChild(style);
+}
 
 export default Navbar;
