@@ -10,6 +10,8 @@ function AdminPanel() {
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState('');
   const [filter, setFilter] = useState('all');
+  const [roleRequests, setRoleRequests] = useState([]);
+  const [showRoleRequests, setShowRoleRequests] = useState(false);
 
   useEffect(() => {
     if (!user || user.role !== 'admin') { navigate('/login'); return; }
@@ -67,6 +69,32 @@ function AdminPanel() {
     return { text: '⏳ Waiting for both to acknowledge', color: '#6B7280', bg: '#F9FAFB' };
   };
 
+  // change the role
+  const fetchRoleRequests = async () => {
+    try {
+      const res = await axios.get(`https://aharasetu-backend-pov2.onrender.com/api/profile/role-requests/all`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setRoleRequests(res.data);
+    } catch (err) { console.error(err); }
+  };
+
+  fetchRoleRequests();
+  const interval = setInterval(() => {
+    fetchListings();
+    fetchRoleRequests();
+  }, 5000);
+
+  const handleRoleRequest = async (id, action) => {
+    try {
+      await axios.put(`https://aharasetu-backend-pov2.onrender.com/api/profile/role-request/${id}`,
+        { action },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setMessage(action === 'approve' ? '✅ Role change approved!' : '❌ Role change rejected!');
+      fetchRoleRequests();
+    } catch (err) { setMessage('❌ Something went wrong!'); }
+  };
   const getStatusBadge = (item) => {
     if (item.status === 'completed') return { label: '🎉 Completed', color: '#16A34A', bg: '#F0FDF4' };
     if (item.adminRejected) return { label: '❌ Rejected', color: '#DC2626', bg: '#FEF2F2' };
@@ -122,8 +150,72 @@ function AdminPanel() {
             <h1 style={styles.title}>Admin Panel</h1>
             <p style={styles.sub}>Review listings, manage claims and complete transactions</p>
           </div>
-          <div style={styles.adminBadge}>🛡️ Admin</div>
+          <button
+            style={{
+              ...styles.roleRequestsBtn,
+              background: roleRequests.filter(r => r.status === 'pending').length > 0
+                ? '#FF5200' : 'white',
+              color: roleRequests.filter(r => r.status === 'pending').length > 0
+                ? 'white' : '#374151',
+            }}
+            onClick={() => setShowRoleRequests(!showRoleRequests)}
+          >
+            Role Requests
+            {roleRequests.filter(r => r.status === 'pending').length > 0 && (
+              <span style={styles.roleRequestBadge}>
+                {roleRequests.filter(r => r.status === 'pending').length}
+              </span>
+            )}
+          </button>
         </div>
+        {showRoleRequests && (
+          <div style={styles.roleRequestsPanel}>
+            <h3 style={styles.roleRequestsPanelTitle}>Role Change Requests</h3>
+            {roleRequests.length === 0 ? (
+              <p style={{ color: '#9CA3AF', fontSize: '0.88rem' }}>No role change requests</p>
+            ) : (
+              roleRequests.map(req => (
+                <div key={req._id} style={styles.roleRequestCard}>
+                  <div style={styles.roleRequestInfo}>
+                    <p style={styles.roleRequestName}>{req.user?.name}</p>
+                    <p style={styles.roleRequestEmail}>{req.user?.email}</p>
+                    <div style={styles.roleRequestRoles}>
+                      <span style={styles.roleFrom}>{req.currentRole}</span>
+                      <span style={{ color: '#9CA3AF' }}>→</span>
+                      <span style={styles.roleTo}>{req.requestedRole}</span>
+                    </div>
+                    <p style={styles.roleRequestReason}>"{req.reason}"</p>
+                  </div>
+                  {req.status === 'pending' ? (
+                    <div style={styles.roleRequestActions}>
+                      <button
+                        style={styles.approveSmBtn}
+                        onClick={() => handleRoleRequest(req._id, 'approve')}
+                      >
+                        Approve
+                      </button>
+                      <button
+                        style={styles.rejectSmBtn}
+                        onClick={() => handleRoleRequest(req._id, 'reject')}
+                      >
+                        Reject
+                      </button>
+                    </div>
+                  ) : (
+                    <span style={{
+                      fontSize: '0.72rem', fontWeight: '700',
+                      color: req.status === 'approved' ? '#16A34A' : '#DC2626',
+                      background: req.status === 'approved' ? '#F0FDF4' : '#FEF2F2',
+                      padding: '3px 10px', borderRadius: '20px',
+                    }}>
+                      {req.status}
+                    </span>
+                  )}
+                </div>
+              ))
+            )}
+          </div>
+        )}
 
         {/* Stats */}
         <div style={styles.statsGrid}>
@@ -391,6 +483,21 @@ const styles = {
   completedTag: { textAlign: 'center', fontSize: '0.84rem', color: '#16A34A', fontWeight: '700', padding: '10px', background: '#F0FDF4', borderRadius: '8px' },
   approvedTag: { textAlign: 'center', fontSize: '0.8rem', color: '#16A34A', fontWeight: '600', padding: '8px', background: '#F0FDF4', borderRadius: '8px' },
   rejectedTag: { textAlign: 'center', fontSize: '0.8rem', color: '#DC2626', fontWeight: '600', padding: '8px', background: '#FEF2F2', borderRadius: '8px' },
+  roleRequestsBtn: { padding: '9px 16px', borderRadius: '9px', border: '1.5px solid #E5E7EB', fontSize: '0.84rem', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 },
+  roleRequestBadge: { background: 'white', color: '#FF5200', fontSize: '0.68rem', fontWeight: '800', padding: '1px 7px', borderRadius: '20px' },
+  roleRequestsPanel: { background: 'white', border: '1px solid #F0F0F0', borderRadius: '14px', padding: '20px', marginBottom: '20px', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' },
+  roleRequestsPanelTitle: { fontSize: '0.95rem', fontWeight: '700', color: '#1C1C1C', marginBottom: '14px' },
+  roleRequestCard: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', padding: '12px 0', borderBottom: '1px solid #F3F4F6', gap: '12px' },
+  roleRequestInfo: { flex: 1 },
+  roleRequestName: { fontSize: '0.88rem', fontWeight: '600', color: '#1C1C1C', marginBottom: '2px' },
+  roleRequestEmail: { fontSize: '0.76rem', color: '#9CA3AF', marginBottom: '6px' },
+  roleRequestRoles: { display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' },
+  roleFrom: { fontSize: '0.75rem', color: '#6B7280', background: '#F3F4F6', padding: '2px 8px', borderRadius: '10px', fontWeight: '600', textTransform: 'capitalize' },
+  roleTo: { fontSize: '0.75rem', color: '#FF5200', background: '#FFF0EB', padding: '2px 8px', borderRadius: '10px', fontWeight: '600', textTransform: 'capitalize' },
+  roleRequestReason: { fontSize: '0.78rem', color: '#6B7280', fontStyle: 'italic' },
+  roleRequestActions: { display: 'flex', gap: '6px', flexShrink: 0 },
+  approveSmBtn: { padding: '6px 14px', background: '#16A34A', color: 'white', border: 'none', borderRadius: '7px', fontSize: '0.78rem', fontWeight: '600', cursor: 'pointer' },
+  rejectSmBtn: { padding: '6px 14px', background: '#DC2626', color: 'white', border: 'none', borderRadius: '7px', fontSize: '0.78rem', fontWeight: '600', cursor: 'pointer' },
 };
 
 export default AdminPanel;

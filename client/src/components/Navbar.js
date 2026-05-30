@@ -106,7 +106,10 @@ function Navbar() {
             {user ? (
               <>
                 <NotificationBell />
-                <div style={styles.userChip}>
+                <div
+                  style={{ ...styles.userChip, cursor: 'pointer' }}
+                  onClick={() => navigate('/profile')}
+                >
                   <div style={styles.userAvatar}>
                     {user.name?.charAt(0).toUpperCase()}
                   </div>

@@ -15,6 +15,7 @@ import VerifyOTP from './pages/VerifyOTP';
 import ContactUs from './pages/ContactUs';
 import ReportIssue from './pages/ReportIssue';
 import PostSuccess from './pages/PostSuccess';
+import Profile from './pages/Profile';
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/profile" element={<Profile />} />
         <Route path="/admin" element={<AdminPanel />} />
         <Route path="/my-listings" element={<MyListings />} />
         <Route path="/my-claims" element={<MyClaims />} />
