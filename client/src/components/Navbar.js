@@ -53,7 +53,7 @@ function Navbar() {
           </Link>
 
           {/* Desktop Links */}
-          <div style={styles.desktopLinks}>
+          <div style={styles.desktopLinks} className="desktop-links">
             {navLinks.map(link => (
               <Link
                 key={link.to}
@@ -76,18 +76,19 @@ function Navbar() {
                 <div
                   style={styles.userChip}
                   onClick={() => navigate('/profile')}
+                  className="user-chip"
                 >
                   <div style={styles.avatar}>
                     {user.name?.charAt(0).toUpperCase()}
                   </div>
-                  <div style={styles.userInfo}>
+                  <div style={styles.userInfo} className="user-chip-name">
                     <span style={styles.userName}>{user.name}</span>
                     <span style={styles.userRole}>{user.role}</span>
                   </div>
                 </div>
                 {/* Desktop logout */}
                 <button
-                  style={{ ...styles.logoutBtn, display: 'none' }}
+                  style={{ ...styles.logoutBtn }}
                   className="hide-mobile"
                   onClick={handleLogout}
                 >
@@ -95,11 +96,20 @@ function Navbar() {
                 </button>
               </>
             ) : (
-              <div style={styles.authBtns}>
+              <div style={styles.authBtns} className="hide-mobile">
                 <Link to="/login" style={styles.loginBtn}>Login</Link>
                 <Link to="/register" style={styles.registerBtn}>Sign Up</Link>
               </div>
             )}
+             <button
+                style={styles.hamburger}
+                className="hamburger"
+                onClick={() => setMenuOpen(!menuOpen)}
+              >
+                <div style={{...styles.hamLine, ...(menuOpen ? styles.hamLine1Open : {})}} />
+                <div style={{...styles.hamLine, ...(menuOpen ? styles.hamLine2Open : {})}} />
+                <div style={{...styles.hamLine, ...(menuOpen ? styles.hamLine3Open : {})}} />
+              </button>
           </div>
         </div>
       </nav>
@@ -190,7 +200,6 @@ const styles = {
   },
   desktopLinks: {
     display: 'flex', alignItems: 'center', gap: '2px', flex: 1,
-    '@media (max-width: 768px)': { display: 'none' },
   },
   navLink: {
     padding: '6px 12px', borderRadius: '7px',
@@ -305,20 +314,5 @@ const styles = {
     textAlign: 'center', display: 'block',
   },
 };
-
-// Hide desktop links on mobile using JS
-if (typeof window !== 'undefined') {
-  const style = document.createElement('style');
-  style.innerHTML = `
-    @media (max-width: 768px) {
-      .desktop-links { display: none !important; }
-      .user-chip-name { display: none !important; }
-    }
-    @media (min-width: 769px) {
-      .hamburger { display: none !important; }
-    }
-  `;
-  document.head.appendChild(style);
-}
 
 export default Navbar;

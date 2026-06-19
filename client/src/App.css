@@ -54,3 +54,22 @@ input, textarea, select { font-family: inherit; }
   background: var(--off-white);
   padding-top: 64px;
 }
+
+/* Navbar Responsive Styles */
+@media (max-width: 768px) {
+  .desktop-links {
+    display: none !important;
+  }
+  .user-chip-name {
+    display: none !important;
+  }
+  .hide-mobile {
+    display: none !important;
+  }
+}
+
+@media (min-width: 769px) {
+  .hamburger {
+    display: none !important;
+  }
+}
